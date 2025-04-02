@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺动脉三维建模与诊断辅助系统</title>
+    <!-- 引入Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+        }
+        
+        body {
+            background-color: #243447;
+            color: #FFFFFF;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background-color: #1A2B3C;
+            height: 15vh;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            width: 300px;
+            white-space: nowrap;
+        }
+        
+        .search-bar {
+            background-color: #34495E;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 15px;
+            width: 240px;
+            height: 40px;
+            margin-right: 20px;
+        }
+        
+        .buttons-group {
+            display: flex;
+            margin-left: 20px;
+        }
+        
+        .nav-button {
+            background-color: #3E5F8A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            min-width: 45px;
+            height: 25px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-button:hover {
+            background-color: #5A9FE2;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            font-size: 14px;
+            color: #B8C3CE;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4A90E2;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 中央表格区域 */
+        .table-container {
+            height: 45vh;
+            overflow-y: auto;
+            border-bottom: 1px solid #3E5F8A;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        thead {
+            background-color: #2C3E50;
+            position: sticky;
+            top: 0;
+        }
+        
+        th {
+            padding: 15px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        
+        tbody tr {
+            background-color: #34495E;
+            border-bottom: 1px solid #3E5F8A;
+            height: 48px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: #3E5F8A;
+        }
+        
+        tbody tr.selected {
+            background-color: #2C3E50;
+            border-left: 4px solid #2ECC71;
+        }
+        
+        td {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #B8C3CE;
+        }
+        
+        /* 底部预览和操作区 */
+        .preview-section {
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #2C3E50;
+            height: 44px;
+        }
+        
+        .tab {
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            background-color: #3E5F8A;
+            border-bottom: 3px solid #4A90E2;
+        }
+        
+        .tab:hover {
+            background-color: #3E5F8A;
+        }
+        
+        .thumbnails {
+            display: flex;
+            padding: 20px;
+            overflow-x: auto;
+            background-color: #1A2B3C;
+            height: calc(100% - 88px);
+        }
+        
+        .thumbnail {
+            width: 160px;
+            height: 160px;
+            margin-right: 20px;
+            background-color: #000000;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+        
+        .thumbnail img {
+            display: none;
+        }
+        
+        .thumbnail-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 43, 60, 0.8);
+            color: #FFFFFF;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        /* 右键菜单样式 */
+        .context-menu {
+            display: none;
+            position: absolute;
+            background-color: #243447;
+            border: 1px solid #3E5F8A;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        
+        .context-menu-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #FFFFFF;
+            font-size: 13px;
+        }
+        
+        .context-menu-item:hover {
+            background-color: #3E5F8A;
+        }
+        
+        .function-buttons {
+            display: flex;
+            background-color: #2C3E50;
+            padding: 0 20px;
+            overflow-x: auto;
+            height: 44px;
+        }
+        
+        .function-btn {
+            min-width: 120px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: none;
+            color: #B8C3CE;
+            cursor: pointer;
+            margin-right: 16px;
+            transition: background-color 0.2s;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .function-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        .function-btn:hover {
+            background-color: #3E5F8A;
+            color: white;
+        }
+        
+        .function-btn.active {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #2C3E50;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3E5F8A;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4A90E2;
+        }
+        
+        /* 弹出窗口样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 添加顶部下拉菜单样式，确保没有滚动条 */
+        .tool-dropdown {
+            position: relative;
+        }
+        
+        .tool-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #152c5e;
+            min-width: 200px;
+            max-width: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 2500;
+            border-radius: 3px;
+            border: 1px solid #2a4d9e;
+            padding: 5px;
+            left: 0;
+            top: 100%;
+        }
+        
+        .tool-dropdown.active .tool-dropdown-content {
+            display: block;
+        }
+        
+        .tool-dropdown-group {
+            margin-bottom: 5px;
+        }
+        
+        .tool-dropdown-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background-color: #1e3a8a;
+            padding: 3px 6px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+        
+        .tool-dropdown-items {
+            padding: 3px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+        
+        .tool-dropdown-items .dropdown-button {
+            text-align: left;
+            width: 100%;
+            padding: 5px;
+            white-space: nowrap;
+            border-radius: 3px;
+            margin: 2px 0;
+        }
+        
+        .tool-dropdown-items .dropdown-button:hover {
+            background-color: #2A4D9E;
+        }
+        
+        .tool-dropdown-items .dropdown-button.active {
+            background-color: #3E5F8A;
+        }
+        
+        .modal-content {
+            position: relative;
+            background-color: #243447;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3E5F8A;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        
+        .close-btn {
+            color: #B8C3CE;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            color: #FFFFFF;
+        }
+        
+        .modal-body {
+            padding: 10px 0;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #3E5F8A;
+            padding-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            background-color: #3E5F8A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        
+        .modal-btn:hover {
+            background-color: #5A9FE2;
+        }
+        
+        .modal-btn.primary {
+            background-color: #4A90E2;
+        }
+        
+        .modal-input {
+            background-color: #34495E;
+            border: 1px solid #3E5F8A;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 15px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="display: flex; align-items: center;">
+                <div class="logo">肺动脉介入手术计划管理系统</div>
+                <div style="margin-left: 50px;">
+                    <input type="text" class="search-bar" placeholder="输入搜索内容">
+                </div>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <div class="buttons-group">
+                    <div class="tool-dropdown">
+                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-folder-open"></i> 文件管理</button>
+                        <div class="tool-dropdown-content">
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">导入/导出</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" onclick="handleImport()">导入文件</button>
+                                    <button class="dropdown-button" onclick="handleExport()">导出数据</button>
+                                    <button class="dropdown-button" onclick="showPacsModal()">PACS查询</button>
+                                    <button class="dropdown-button" onclick="handleDicomExport()">DICOM导出</button>
+                                </div>
+                            </div>
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">数据操作</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" id="deleteBtn" onclick="showDeleteConfirmModal()">删除数据</button>
+                                    <button class="dropdown-button" onclick="handleBackup()">备份数据</button>
+                                    <button class="dropdown-button" onclick="handleRestore()">数据恢复</button>
+                                    <button class="dropdown-button" onclick="handleArchive()">归档</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tool-dropdown">
+                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-cog"></i> 系统设置</button>
+                        <div class="tool-dropdown-content">
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">用户设置</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" onclick="handleUserProfile()">用户信息</button>
+                                    <button class="dropdown-button" onclick="handlePassword()">修改密码</button>
+                                    <button class="dropdown-button" onclick="handlePreferences()">偏好设置</button>
+                                </div>
+                            </div>
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">系统配置</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" onclick="handleServerConfig()">服务器设置</button>
+                                    <button class="dropdown-button" onclick="handlePacsConfig()">PACS设置</button>
+                                    <button class="dropdown-button" onclick="handleSecurity()">安全设置</button>
+                                    <button class="dropdown-button" onclick="handleAdvanced()">高级设置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tool-dropdown">
+                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-database"></i> 数据分析</button>
+                        <div class="tool-dropdown-content">
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">统计报表</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" onclick="handlePatientStats()">患者统计</button>
+                                    <button class="dropdown-button" onclick="handleDiagnosisStats()">诊断统计</button>
+                                    <button class="dropdown-button" onclick="handleTreatmentStats()">治疗统计</button>
+                                    <button class="dropdown-button" onclick="handleCustomReport()">自定义报表</button>
+                                </div>
+                            </div>
+                            <div class="tool-dropdown-group">
+                                <div class="tool-dropdown-title">数据导出</div>
+                                <div class="tool-dropdown-items">
+                                    <button class="dropdown-button" onclick="handleExcelExport()">Excel导出</button>
+                                    <button class="dropdown-button" onclick="handlePdfExport()">PDF报告</button>
+                                    <button class="dropdown-button" onclick="handleDataVisualize()">数据可视化</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-avatar">用户</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加隐藏的文件上传输入 -->
+    <input type="file" id="fileInput" style="display: none;" accept=".dcm,.dicom" multiple />
+    
+    <!-- PACS 搜索弹出框 -->
+    <div id="pacsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">PACS 搜索</div>
+                <span class="close-btn" onclick="closeModal('pacsModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" placeholder="输入患者ID或姓名搜索" id="pacsSearchInput">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('pacsModal')">取消</button>
+                <button class="modal-btn primary" onclick="handlePacsSearch()">搜索</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 删除确认弹出框 -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">删除确认</div>
+                <span class="close-btn" onclick="closeModal('deleteConfirmModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="color: #FFFFFF;">确定要删除选中的项目吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('deleteConfirmModal')">取消</button>
+                <button class="modal-btn primary" onclick="closeModal('deleteConfirmModal')">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 重命名弹出框 -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">重命名</div>
+                <span class="close-btn" onclick="closeModal('renameModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="modal-input" placeholder="请输入新名称" id="renameInput">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal('renameModal')">取消</button>
+                <button class="modal-btn primary" onclick="handleRename()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 中央表格区域 -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th width="140px">检查时间</th>
+                    <th width="160px">患者姓名</th>
+                    <th width="120px">出生日期</th>
+                    <th width="80px">性别</th>
+                    <th width="150px">患者ID</th>
+                    <th width="120px">工作台</th>
+                    <th width="100px">影像类型</th>
+                    <th width="200px">检查描述</th>
+                    <th width="170px">检查号</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2023-03-15 09:12:36</td>
+                    <td>张先生</td>
+                    <td>1968-07-22</td>
+                    <td>M</td>
+                    <td>PA20230315001</td>
+                    <td>肺动脉CT</td>
+                    <td>CT</td>
+                    <td>肺动脉高压检查</td>
+                    <td>CT20230315001</td>
+                </tr>
+                <tr>
+                    <td>2023-05-21 14:35:09</td>
+                    <td>王女士</td>
+                    <td>1972-11-09</td>
+                    <td>F</td>
+                    <td>PA20230521002</td>
+                    <td>先心病筛查</td>
+                    <td>CT</td>
+                    <td>肺动脉高压伴房间隔缺损</td>
+                    <td>CT20230521002</td>
+                </tr>
+                <tr>
+                    <td>2023-07-08 10:27:45</td>
+                    <td>李先生</td>
+                    <td>1956-03-18</td>
+                    <td>M</td>
+                    <td>PA20230708003</td>
+                    <td>CTEPH评估</td>
+                    <td>CT</td>
+                    <td>慢性血栓栓塞性肺动脉高压</td>
+                    <td>CT20230708003</td>
+                </tr>
+                <tr>
+                    <td>2023-09-17 11:05:23</td>
+                    <td>陈女士</td>
+                    <td>1985-12-04</td>
+                    <td>F</td>
+                    <td>PA20230917004</td>
+                    <td>肺动脉CT</td>
+                    <td>CTA</td>
+                    <td>肺动脉畸形评估</td>
+                    <td>CT20230917004</td>
+                </tr>
+                <tr>
+                    <td>2023-11-30 16:42:18</td>
+                    <td>刘先生</td>
+                    <td>1977-05-25</td>
+                    <td>M</td>
+                    <td>PA20231130005</td>
+                    <td>肺栓塞检查</td>
+                    <td>CTA</td>
+                    <td>急性肺栓塞评估</td>
+                    <td>CT20231130005</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 底部预览和操作区 -->
+    <div class="preview-section">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(this, 'all')">全部序列</div>
+            <div class="tab" onclick="switchTab(this, 'workstation')">工作台</div>
+        </div>
+        <div class="thumbnails" id="thumbnails-container">
+            <!-- 缩略图将在双击表格行时动态加载 -->
+        </div>
+        <div class="function-buttons">
+            <div class="function-btn disabled" style="min-width: 80px;">
+                <input type="checkbox" id="selectAll" onclick="handleSelectAll(this)" disabled> 
+                <label for="selectAll" style="cursor: not-allowed; margin-left: 5px;">全选</label>
+            </div>
+            <button class="function-btn disabled" onclick="activateButton(this)">肺动脉主干</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">左肺动脉</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">右肺动脉</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">肺动脉瓣</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">肺静脉</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">4D工作台</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">肺动脉压力分析</button>
+            <button class="function-btn disabled" onclick="activateButton(this)">病变标记</button>
+        </div>
+    </div>
+
+    <script>
+        // 当前活动视图类型 (all = 全部序列, workstation = 工作台)
+        let currentViewType = 'all';
+        
+        // 当前是否有选中的缩略图
+        let hasThumbnailSelected = false;
+        
+        // 全选状态
+        let allThumbnailsSelected = false;
+        
+        // 储存不同数据行的影像数据
+        const imageDataSets = {
+            row1: {
+                all: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyOTgwYjkiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgODBDNTAgODAgNjUgOTAgODAgODVDOTUgODAgMTEwIDkwIDExMCAxMDAiIHN0cm9rZT0iI0ZGNzA3MCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PHRleHQgeD0iNTAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5MQU8gU2NhbjwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyOTgwYjkiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTM1IDgwQzQwIDg1IDYwIDkwIDgwIDg1QzEwMCA4MCAxMjAgODUgMTI1IDk1IiBzdHJva2U9IiNGRjcwNzAiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+UEEgQ1QgU2NhbjwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyOTgwYjkiLz48cGF0aCBkPSJNNDAgODBDNDAgODAgODAgNDAgMTIwIDgwIiBzdHJva2U9IiNGRjcwNzAiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+RENTQSBJbWFnZTwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyOTgwYjkiLz48cG9seWxpbmUgcG9pbnRzPSI0MCw4MCA2MCw4MCA4MCwxMDAgMTAwLDgwIDEyMCw4NSIgc3Ryb2tlPSIjRkY3MDcwIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSI0MCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkNUQSBTY2FuPC90ZXh0Pjwvc3ZnPg=='
+                ],
+                workstation: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyNzJlMzgiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjNzBiZGZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNjAgODBDNzAgNjAgODAgNzAgOTAgODBDMTAwIDkwIDExMCA4MCAxMjAgNjAiIHN0cm9rZT0iIzcwYmRmZiIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5QQSAzRCBNb2RlbDwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyNzJlMzgiLz48cmVjdCB4PSI0MCIgeT0iNjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNzBiZGZmIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIzNSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlNlZ21lbnRhdGlvbjwvdGV4dD48L3N2Zz4='
+                ]
+            },
+            row2: {
+                all: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyNzc1NTUiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIyMCIgc3Ryb2tlPSIjNzBlZWEyIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNNzAgNzVDNzAgNzUgODAgODUgODAgOTVDODAgMTA1IDkwIDEwNSA5MCA5NSIgc3Ryb2tlPSIjNzBlZWEyIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSI0MCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkRzYSBJbWFnZTwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyNzc1NTUiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTYwIDgwQzYwIDgwIDcwIDkwIDgwIDgwQzkwIDcwIDEwMCA3MCAxMDAgOTAiIHN0cm9rZT0iIzcwZWVhMiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PHRleHQgeD0iNDAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5QQSBGbG93IFNjYW48L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyNzc1NTUiLz48cG9seWdvbiBwb2ludHM9IjgwLDQwIDQwLDEyMCAxMjAsMTIwIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+Q1RQQSBTdHVkeTwvdGV4dD48L3N2Zz4='
+                ],
+                workstation: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyMjUwNmEiLz48cGF0aCBkPSJNNDAgNDBINjBWMTIwSDQwVjQwWk0xMDAgNDBIMTIwVjEyMEgxMDBWNDBaIiBzdHJva2U9IiM4MGNjZmYiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjM1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+UEEgU3RlbnQ8L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyMjUwNmEiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjODBjY2ZmIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNNjAgODBDNzAgNzUgODAgODUgOTAgODAgQzEwMCA3NSAxMTAgODAgMTIwIDg1IiBzdHJva2U9IiM4MGNjZmYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjMwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+QW5naW9ncmFwaHk8L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMyMjUwNmEiLz48bGluZSB4MT0iNDAiIHkxPSI0MCIgeDI9IjEyMCIgeTI9IjEyMCIgc3Ryb2tlPSIjODBjY2ZmIiBzdHJva2Utd2lkdGg9IjMiIC8+PGxpbmUgeDE9IjEyMCIgeTE9IjQwIiB4Mj0iNDAiIHkyPSIxMjAiIHN0cm9rZT0iIzgwY2NmZiIgc3Ryb2tlLXdpZHRoPSIzIiAvPjx0ZXh0IHg9IjE1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+RnVzaW9uIERhdGE8L3RleHQ+PC9zdmc+'
+                ]
+            },
+            row3: {
+                all: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM4ZTQ0YWQiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgODBDNTAgODAgNjUgOTAgODAgODVDOTUgODAgMTEwIDkwIDExMCAxMDAiIHN0cm9rZT0iI2QzYTRmZiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5QQSBNUkk8L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM4ZTQ0YWQiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTM1IDgwQzQwIDg1IDYwIDkwIDgwIDg1QzEwMCA4MCAxMjAgODUgMTI1IDk1IiBzdHJva2U9IiNkM2E0ZmYiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+VE9GIE1SQTwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM4ZTQ0YWQiLz48cGF0aCBkPSJNNDAgODBDNDAgODAgODAgNDAgMTIwIDgwIiBzdHJva2U9IiNkM2E0ZmYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjMwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+UEMtTVJBPC90ZXh0Pjwvc3ZnPg==',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM4ZTQ0YWQiLz48cG9seWxpbmUgcG9pbnRzPSI0MCw4MCA2MCw4MCA4MCwxMDAgMTAwLDgwIDEyMCw4NSIgc3Ryb2tlPSIjZDNhNGZmIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIzMCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkNFLU1SQTwvdGV4dD48L3N2Zz4='
+                ],
+                workstation: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cGF0aCBkPSJNNDAgNDBDNDAgNDAgODAgMzAgMTIwIDQwQzE2MCA1MCAxMjAgMTIwIDgwIDEyMEM0MCAxMjAgMCA5MCA0MCA0MFoiIHN0cm9rZT0iI2ZmYzE4MCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIGZpbGw9IiNmZmMxODAiLz48dGV4dCB4PSIyNSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlBFVCBGdXNpb248L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cmVjdCB4PSI0MCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjMTgwIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iNDAiIHkxPSI2MCIgeDI9IjEyMCIgeTI9IjYwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI0MCIgeTE9IjgwIiB4Mj0iMTIwIiB5Mj0iODAiIHN0cm9rZT0iI2ZmYzE4MCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjQwIiB5MT0iMTAwIiB4Mj0iMTIwIiB5Mj0iMTAwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjI1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+U1VWIEL5oGvljZU8L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cGF0aCBkPSJNNDAgNDBDNTAgNDAgNjAgNjAgODAgNjBDMTAwIDYwIDExMCA0MCAxMjAgNDBNNDAgMTIwQzUwIDEyMCA2MCAxMDAgODAgMTAwQzEwMCAxMDAgMTEwIDEyMCAxMjAgMTIwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+UFHlvaLnirY8L3RleHQ+PC9zdmc+'
+                ]
+            },
+            row4: {
+                all: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNkMzU0MDAiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIyMCIgc3Ryb2tlPSIjZmZkMmEwIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNNzAgNzVDNzAgNzUgODAgODUgODAgOTVDODAgMTA1IDkwIDEwNSA5MCA5NSIgc3Ryb2tlPSIjZmZkMmEwIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIzMCIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlBFVC1DVDwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNkMzU0MDAiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTYwIDgwQzYwIDgwIDcwIDkwIDgwIDgwQzkwIDcwIDEwMCA3MCAxMDAgOTAiIHN0cm9rZT0iI2ZmZDJhMCIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5TUEVDVC1DVDwvdGV4dD48L3N2Zz4=',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiNkMzU0MDAiLz48cGF0aCBkPSJNNDAgNDBINjBWNjBINDBWNDAgTTgwIDQwSDEwMFY2MEg4MFY0MCBNNDAgODBINjBWMTAwSDQwVjgwIE04MCA4MEgxMDBWMTIwSDgwVjgwIE0xMjAgNDBIMTQwVjEyMEgxMjBWNDAiIHN0cm9rZT0iI2ZmZDJhMCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5GREc6UEVUIEFuYWx5c2lzPC90ZXh0Pjwvc3ZnPg=='
+                ],
+                workstation: [
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cGF0aCBkPSJNNDAgNDBDNDAgNDAgODAgMzAgMTIwIDQwQzE2MCA1MCAxMjAgMTIwIDgwIDEyMEM0MCAxMjAgMCA5MCA0MCA0MFoiIHN0cm9rZT0iI2ZmYzE4MCIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIGZpbGw9IiNmZmMxODAiLz48dGV4dCB4PSIyNSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPlBFVCBGdXNpb248L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cmVjdCB4PSI0MCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZjMTgwIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iNDAiIHkxPSI2MCIgeDI9IjEyMCIgeTI9IjYwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI0MCIgeTE9IjgwIiB4Mj0iMTIwIiB5Mj0iODAiIHN0cm9rZT0iI2ZmYzE4MCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjQwIiB5MT0iMTAwIiB4Mj0iMTIwIiB5Mj0iMTAwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIvPjx0ZXh0IHg9IjI1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+U1VWIEL5oGvljZU8L3RleHQ+PC9zdmc+',
+                    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiM5OTNkMDAiLz48cGF0aCBkPSJNNDAgNDBDNTAgNDAgNjAgNjAgODAgNjBDMTAwIDYwIDExMCA0MCAxMjAgNDBNNDAgMTIwQzUwIDEyMCA2MCAxMDAgODAgMTAwQzEwMCAxMDAgMTEwIDEyMCAxMjAgMTIwIiBzdHJva2U9IiNmZmMxODAiIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjI1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+UFHlvaLnirY8L3RleHQ+PC9zdmc+'
+                ]
+            }
+        };
+        
+        // 添加第5行数据
+        imageDataSets['row5'] = {
+            all: [
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxYWJjOWMiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNTAgODBDNTAgODAgNjUgOTAgODAgODVDOTUgODAgMTEwIDkwIDExMCAxMDAiIHN0cm9rZT0iI2I3ZmZlYiIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PHRleHQgeD0iNDAiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj5EMSBTY2Fu8J+SuzwvdGV4dD48L3N2Zz4=',
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxYWJjOWMiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTM1IDgwQzQwIDg1IDYwIDkwIDgwIDg1QzEwMCA4MCAxMjAgODUgMTI1IDk1IiBzdHJva2U9IiNiN2ZmZWIiIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+RDIgU2Nhbu+9nO+9nTwvdGV4dD48L3N2Zz4=',
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxYWJjOWMiLz48cGF0aCBkPSJNNDAgODBDNDAgODAgODAgNDAgMTIwIDgwIiBzdHJva2U9IiNiN2ZmZWIiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPjx0ZXh0IHg9IjM1IiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSI+RDMgU2NhbvCflJM8L3RleHQ+PC9zdmc+',
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxYWJjOWMiLz48cG9seWxpbmUgcG9pbnRzPSI0MCw4MCA2MCw4MCA4MCwxMDAgMTAwLDgwIDEyMCw4NSIgc3Ryb2tlPSIjYjdmZmViIiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiLz48dGV4dCB4PSIzNSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPkQ0IFNjYW7ImzwvdGV4dD48L3N2Zz4='
+            ],
+            workstation: [
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxNThhN2QiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjYTJmOGUzIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNjAgODBDNzAgNjAgODAgNzAgOTAgODBDMTAwIDkwIDExMCA4MCAxMjAgNjAiIHN0cm9rZT0iI2EyZjhlMyIgc3Ryb2tlLXdpZHRoPSI0IiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj7lj4LkvZPnsbvlnotBPC90ZXh0Pjwvc3ZnPg==',
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxNThhN2QiLz48cmVjdCB4PSI0MCIgeT0iNjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYTJmOGUzIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSIzNSIgeT0iNTAiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0id2hpdGUiPuWPguS9k+exu+WeiUI8L3RleHQ+PC9zdmc+',
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMxNThhN2QiLz48cGF0aCBkPSJNNDAgNDBINjBWODBINDBWNDAgTTgwIDQwSDEwMFY4MEg4MFY0MCBNNDAgODBINjBWMTIwSDQwVjgwIE04MCA4MEgxMDBWMTIwSDgwVjgwIE0xMjAgNDBIMTQwVjEyMEgxMjBWNDAiIHN0cm9rZT0iI2EyZjhlMyIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PHRleHQgeD0iMzUiIHk9IjUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IndoaXRlIj7lj4LkvZPnsbvlnotDPC90ZXh0Pjwvc3ZnPg=='
+            ]
+        };
+        
+        // 当前选中的行ID
+        let currentRowId = null;
+
+        // 选择表格行
+        function selectRow(row) {
+            // 移除所有行的选中状态
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(r => r.classList.remove('selected'));
+            
+            // 添加选中状态到当前行
+            row.classList.add('selected');
+            
+            // 保存当前选中行
+            const rowIndex = Array.from(rows).indexOf(row);
+            currentRowId = 'row' + (rowIndex + 1);
+            
+            // 启用删除按钮
+            document.getElementById('deleteBtn').disabled = false;
+            document.getElementById('deleteBtn').classList.remove('disabled');
+        }
+        
+        // 行双击事件
+        function handleRowDblClick(row) {
+            // 先选中行
+            selectRow(row);
+            
+            // 获取行索引
+            const rows = document.querySelectorAll('tbody tr');
+            const rowIndex = Array.from(rows).indexOf(row);
+            const rowId = 'row' + (rowIndex + 1);
+            
+            // 显示对应的图片
+            showImagesForRow(rowId);
+            
+            // 启用删除按钮
+            document.getElementById('deleteBtn').disabled = false;
+            document.getElementById('deleteBtn').classList.remove('disabled');
+        }
+        
+        // 切换标签页
+        function switchTab(tab, viewType) {
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // 添加活动状态到当前标签
+            tab.classList.add('active');
+            
+            // 更新当前视图类型
+            currentViewType = viewType;
+            
+            // 如果已有选中的行，则更新图片
+            if (currentRowId) {
+                showImagesForRow(currentRowId);
+            }
+        }
+        
+        // 为指定行显示图片
+        function showImagesForRow(rowId) {
+            // 清空现有缩略图
+            const container = document.getElementById('thumbnails-container');
+            container.innerHTML = '';
+            
+            // 获取当前视图类型的图片
+            const images = imageDataSets[rowId][currentViewType];
+            
+            // 重置缩略图选中状态
+            hasThumbnailSelected = false;
+            allThumbnailsSelected = false;
+            
+            // 重置功能按钮为禁用状态
+            const buttons = document.querySelectorAll('.function-btn');
+            buttons.forEach(btn => {
+                btn.classList.add('disabled');
+            });
+            
+            // 禁用全选复选框
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.disabled = true;
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.parentElement.querySelector('label').style.cursor = 'not-allowed';
+            }
+            
+            // 添加图片到容器
+            if (images && images.length > 0) {
+                images.forEach((imgSrc, index) => {
+                    const thumbnailDiv = document.createElement('div');
+                    thumbnailDiv.className = 'thumbnail';
+                    
+                    // 直接显示文字，不显示图片
+                    if (currentViewType === 'all') {
+                        thumbnailDiv.textContent = `图像 ${index + 1}`;
+                    } else {
+                        thumbnailDiv.textContent = `工作台 ${index + 1}`;
+                    }
+                    
+                    // 添加点击事件处理
+                    thumbnailDiv.onclick = function() { 
+                        // 移除所有缩略图的选中状态
+                        document.querySelectorAll('.thumbnail').forEach(t => {
+                            t.style.border = 'none';
+                        });
+                        
+                        // 添加选中状态
+                        this.style.border = '3px solid #2ECC71';
+                        
+                        // 标记已有缩略图被选中
+                        hasThumbnailSelected = true;
+                        
+                        // 启用底部功能按钮
+                        enableFunctionButtons();
+                        
+                        // 打开图像
+                        openImage(this);
+                    };
+                    
+                    // 添加右键菜单
+                    thumbnailDiv.addEventListener('contextmenu', function(e) {
+                        // 保存当前操作的缩略图
+                        currentThumbnail = this;
+                        
+                        // 根据视图类型显示不同的右键菜单
+                        if (currentViewType === 'all') {
+                            // 全部序列的右键菜单
+                            showContextMenu(e, [
+                                {
+                                    text: '删除',
+                                    action: function() {
+                                        deleteThumbnail();
+                                    }
+                                }
+                            ]);
+                        } else {
+                            // 工作台的右键菜单
+                            showContextMenu(e, [
+                                {
+                                    text: '打开工作台',
+                                    action: openWorkstation
+                                },
+                                {
+                                    text: '重命名',
+                                    action: showRenameModal
+                                },
+                                {
+                                    text: '删除信息',
+                                    action: function() {
+                                        deleteThumbnail();
+                                    }
+                                }
+                            ]);
+                        }
+                    });
+                    
+                    // 添加双击事件处理工作台图片
+                    if (currentViewType === 'workstation') {
+                        thumbnailDiv.addEventListener('dblclick', function() {
+                            openWorkstation();
+                        });
+                    }
+                    
+                    container.appendChild(thumbnailDiv);
+                });
+            } else {
+                // 无图片时显示提示
+                const noImageDiv = document.createElement('div');
+                noImageDiv.style.padding = '20px';
+                noImageDiv.style.color = '#B8C3CE';
+                noImageDiv.textContent = '无可用图像';
+                container.appendChild(noImageDiv);
+            }
+        }
+        
+        // 启用底部功能按钮
+        function enableFunctionButtons() {
+            const buttons = document.querySelectorAll('.function-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+            
+            // 启用全选复选框
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.disabled = false;
+                selectAllCheckbox.parentElement.querySelector('label').style.cursor = 'pointer';
+            }
+        }
+        
+        // 处理导入按钮点击
+        function handleImport() {
+            // 模拟点击隐藏的文件上传输入
+            document.getElementById('fileInput').click();
+        }
+        
+        // 处理导出按钮点击
+        function handleExport() {
+            // 获取表格数据
+            const table = document.querySelector('table');
+            let csv = [];
+            
+            // 获取表头
+            const headers = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => {
+                headers.push(cell.innerText);
+            });
+            csv.push(headers.join(','));
+            
+            // 获取表格数据
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const rowData = [];
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    // 处理CSV中的特殊字符
+                    let text = cell.innerText || '';
+                    if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+                        text = '"' + text.replace(/"/g, '""') + '"';
+                    }
+                    rowData.push(text);
+                });
+                csv.push(rowData.join(','));
+            });
+            
+            // 创建CSV文件并下载
+            const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', '患者数据.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 激活功能按钮
+        function activateButton(btn) {
+            // 如果按钮是禁用状态，不执行任何操作
+            if (btn.classList.contains('disabled')) {
+                return;
+            }
+            
+            // 移除所有按钮的活动状态
+            const buttons = document.querySelectorAll('.function-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            // 添加活动状态到当前按钮
+            btn.classList.add('active');
+            
+            // 如果是4D工作台按钮，模拟导航到3D建模页面
+            if(btn.textContent.includes('4D工作台')) {
+                navigateToWorkstation();
+            } else {
+                // 其他按钮类型也模拟导航
+                navigateToWorkstation(btn.textContent);
+            }
+        }
+        
+        // 导航到工作站页面
+        function navigateToWorkstation(buttonType) {
+            const type = buttonType || '4D工作台';
+            // alert('即将导航到: ' + type + ' 工作界面');
+            
+            // 添加真实的导航逻辑
+            window.location.href = 'workstation/index.html';
+        }
+        
+        // 打开图像
+        function openImage(thumbnail) {
+            // 不再显示提示，当缩略图被点击时，只需要把它标记为选中
+        }
+        
+        // 监听文件上传输入变化
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                let fileNames = [];
+                for (let i = 0; i < files.length; i++) {
+                    fileNames.push(files[i].name);
+                }
+                alert('已选择 ' + files.length + ' 个文件: \n' + fileNames.join('\n'));
+                
+                // 清空选择，以便下次可以选择相同的文件
+                this.value = '';
+            }
+        });
+        
+        // 初始化：为表格行添加双击事件
+        function initializeTable() {
+            const rows = document.querySelectorAll('tbody tr');
+            
+            // 移除所有现有的onclick和click事件
+            rows.forEach(row => {
+                row.onclick = null;
+                
+                // 移除所有事件监听器
+                const newRow = row.cloneNode(true);
+                row.parentNode.replaceChild(newRow, row);
+                
+                // 只添加双击事件
+                newRow.addEventListener('dblclick', function() {
+                    handleRowDblClick(this);
+                });
+            });
+            
+            // 移除所有行的选中状态
+            rows.forEach(r => r.classList.remove('selected'));
+            
+            // 禁用删除按钮
+            document.getElementById('deleteBtn').disabled = true;
+            document.getElementById('deleteBtn').classList.add('disabled');
+        }
+        
+        // 页面加载后初始化
+        window.onload = function() {
+            initializeTable();
+            
+            // 添加点击事件监听，关闭模态窗口
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            };
+            
+            // 清空初始状态下的缩略图容器
+            document.getElementById('thumbnails-container').innerHTML = '';
+            
+            // 重置当前选中行ID
+            currentRowId = null;
+        };
+        
+        // 选择所有图像缩略图
+        function handleSelectAll(checkbox) {
+            // 如果复选框被禁用，不执行任何操作
+            if (checkbox.disabled) {
+                return;
+            }
+            
+            // 更新全选状态
+            allThumbnailsSelected = checkbox.checked;
+            
+            // 获取所有缩略图
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            
+            // 根据checkbox状态选择或取消选择所有缩略图
+            thumbnails.forEach(thumbnail => {
+                if (checkbox.checked) {
+                    thumbnail.style.border = '3px solid #2ECC71';
+                } else {
+                    thumbnail.style.border = 'none';
+                }
+            });
+            
+            // 禁用或启用其他功能按钮
+            const buttons = document.querySelectorAll('.function-btn:not(:first-child)');
+            buttons.forEach(btn => {
+                if (checkbox.checked) {
+                    btn.classList.remove('disabled');
+                } else {
+                    // 如果取消全选，只有在还有其他缩略图被选中时才保持按钮启用
+                    if (!hasThumbnailSelected) {
+                        btn.classList.add('disabled');
+                    }
+                }
+            });
+        }
+        
+        // 显示PACS模态窗口
+        function showPacsModal() {
+            document.getElementById('pacsModal').style.display = 'block';
+        }
+        
+        // 显示删除确认模态窗口
+        function showDeleteConfirmModal() {
+            document.getElementById('deleteConfirmModal').style.display = 'block';
+        }
+        
+        // 关闭模态窗口
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 处理PACS搜索
+        function handlePacsSearch() {
+            const searchValue = document.getElementById('pacsSearchInput').value;
+            alert('检索并获取患者信息...\n搜索关键词: ' + searchValue);
+            closeModal('pacsModal');
+        }
+        
+        // 右键菜单变量
+        let contextMenu = null;
+        let currentThumbnail = null;
+        
+        // 创建右键菜单
+        function createContextMenu(items) {
+            // 如果已存在，先删除
+            if (contextMenu) {
+                document.body.removeChild(contextMenu);
+            }
+            
+            // 创建新菜单
+            contextMenu = document.createElement('div');
+            contextMenu.className = 'context-menu';
+            
+            // 添加菜单项
+            items.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'context-menu-item';
+                menuItem.textContent = item.text;
+                menuItem.onclick = item.action;
+                contextMenu.appendChild(menuItem);
+            });
+            
+            document.body.appendChild(contextMenu);
+        }
+        
+        // 显示右键菜单
+        function showContextMenu(e, items) {
+            e.preventDefault();
+            
+            // 创建菜单
+            createContextMenu(items);
+            
+            // 定位菜单
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+            contextMenu.style.display = 'block';
+        }
+        
+        // 隐藏右键菜单
+        function hideContextMenu() {
+            if (contextMenu) {
+                contextMenu.style.display = 'none';
+            }
+        }
+        
+        // 删除缩略图
+        function deleteThumbnail() {
+            if (currentThumbnail) {
+                currentThumbnail.remove();
+                hideContextMenu();
+                
+                // 检查是否还有缩略图
+                const remainingThumbnails = document.querySelectorAll('.thumbnail');
+                if (remainingThumbnails.length === 0) {
+                    // 如果没有缩略图了，禁用功能按钮
+                    const buttons = document.querySelectorAll('.function-btn');
+                    buttons.forEach(btn => {
+                        btn.classList.add('disabled');
+                    });
+                    
+                    // 禁用全选复选框
+                    const selectAllCheckbox = document.getElementById('selectAll');
+                    if (selectAllCheckbox) {
+                        selectAllCheckbox.disabled = true;
+                        selectAllCheckbox.checked = false;
+                        selectAllCheckbox.parentElement.querySelector('label').style.cursor = 'not-allowed';
+                    }
+                    
+                    // 重置选中状态
+                    hasThumbnailSelected = false;
+                    allThumbnailsSelected = false;
+                }
+            }
+        }
+        
+        // 显示重命名弹窗
+        function showRenameModal() {
+            if (currentThumbnail) {
+                const titleElement = currentThumbnail.querySelector('.thumbnail-title');
+                const currentName = titleElement ? titleElement.textContent : '';
+                
+                const renameInput = document.getElementById('renameInput');
+                renameInput.value = currentName;
+                
+                document.getElementById('renameModal').style.display = 'block';
+                hideContextMenu();
+            }
+        }
+        
+        // 处理重命名
+        function handleRename() {
+            if (currentThumbnail) {
+                const newName = document.getElementById('renameInput').value;
+                let titleElement = currentThumbnail.querySelector('.thumbnail-title');
+                
+                if (!titleElement) {
+                    titleElement = document.createElement('div');
+                    titleElement.className = 'thumbnail-title';
+                    currentThumbnail.appendChild(titleElement);
+                }
+                
+                titleElement.textContent = newName;
+                closeModal('renameModal');
+            }
+        }
+        
+        // 全局点击事件，用于隐藏右键菜单
+        document.addEventListener('click', function(e) {
+            hideContextMenu();
+        });
+        
+        // 打开工作台
+        function openWorkstation() {
+            // alert('正在打开工作台...');
+            hideContextMenu();
+            // 后续实现到其他页面的跳转
+            window.location.href = 'workstation/index.html';
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 表格行点击事件
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    handleRowClick(this);
+                });
+                
+                row.addEventListener('dblclick', function() {
+                    handleRowDoubleClick(this);
+                });
+            });
+            
+            // 右键菜单事件
+            document.addEventListener('contextmenu', handleContextMenu);
+            document.addEventListener('click', function() {
+                hideContextMenu();
+            });
+            
+            // 文件上传事件
+            document.getElementById('fileInput').addEventListener('change', handleFileInputChange);
+        });
+        
+        // 下拉菜单切换函数
+        function toggleDropdown(button) {
+            // 关闭所有其他下拉菜单
+            const dropdowns = document.querySelectorAll('.tool-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (dropdown !== button.parentElement && dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                }
+            });
+            
+            // 切换当前下拉菜单
+            button.parentElement.classList.toggle('active');
+            
+            // 点击其他区域关闭下拉菜单
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!button.parentElement.contains(e.target)) {
+                    button.parentElement.classList.remove('active');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+        
+        // 处理表格行点击
+        function handleRowClick(row) {
+            // 移除所有行的选中状态
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(r => r.classList.remove('selected'));
+            
+            // 添加选中状态到当前行
+            row.classList.add('selected');
+            
+            // 保存当前选中行
+            const rowIndex = Array.from(rows).indexOf(row);
+            currentRowId = 'row' + (rowIndex + 1);
+            
+            // 启用删除按钮
+            document.getElementById('deleteBtn').disabled = false;
+            document.getElementById('deleteBtn').classList.remove('disabled');
+        }
+        
+        // 添加处理下拉菜单中各种按钮点击的函数
+        function handleDicomExport() {
+            alert('DICOM导出功能即将推出');
+        }
+        
+        function handleBackup() {
+            alert('数据备份功能即将推出');
+        }
+        
+        function handleRestore() {
+            alert('数据恢复功能即将推出');
+        }
+        
+        function handleArchive() {
+            alert('数据归档功能即将推出');
+        }
+        
+        function handleUserProfile() {
+            alert('用户信息管理功能即将推出');
+        }
+        
+        function handlePassword() {
+            alert('密码修改功能即将推出');
+        }
+        
+        function handlePreferences() {
+            alert('偏好设置功能即将推出');
+        }
+        
+        function handleServerConfig() {
+            alert('服务器设置功能即将推出');
+        }
+        
+        function handlePacsConfig() {
+            alert('PACS设置功能即将推出');
+        }
+        
+        function handleSecurity() {
+            alert('安全设置功能即将推出');
+        }
+        
+        function handleAdvanced() {
+            alert('高级设置功能即将推出');
+        }
+        
+        function handlePatientStats() {
+            alert('患者统计功能即将推出');
+        }
+        
+        function handleDiagnosisStats() {
+            alert('诊断统计功能即将推出');
+        }
+        
+        function handleTreatmentStats() {
+            alert('治疗统计功能即将推出');
+        }
+        
+        function handleCustomReport() {
+            alert('自定义报表功能即将推出');
+        }
+        
+        function handleExcelExport() {
+            alert('Excel导出功能即将推出');
+        }
+        
+        function handlePdfExport() {
+            alert('PDF报告功能即将推出');
+        }
+        
+        function handleDataVisualize() {
+            alert('数据可视化功能即将推出');
+        }
+    </script>
+</body>
+</html> 
