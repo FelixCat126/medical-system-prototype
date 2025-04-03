@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>肺动脉三维建模与诊断辅助系统</title>
+    <title>肺动脉介入手术计划管理系统</title>
     <!-- 引入Font Awesome图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
@@ -822,6 +822,48 @@
             width: 100%;
             margin-bottom: 15px;
         }
+        
+        /* 移动端菜单关闭按钮 */
+        .mobile-menu-close {
+            display: none; /* 默认隐藏 */
+        }
+        
+        @media (max-width: 768px) {
+            /* 移动端菜单关闭按钮样式 */
+            .mobile-menu-close {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                width: 30px;
+                height: 30px;
+                background-color: #3E5F8A;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 2610;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+            
+            .mobile-menu-close:hover {
+                background-color: #4A90E2;
+            }
+            
+            /* 调整菜单内容上边距，为关闭按钮留出空间 */
+            .tool-dropdown-content {
+                padding-top: 50px;
+            }
+            
+            /* 关闭条样式调整 */
+            .tool-dropdown-close {
+                margin-bottom: 25px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -835,6 +877,7 @@
             <div class="tool-dropdown">
                 <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-folder-open"></i> 文件管理</button>
                 <div class="tool-dropdown-content">
+                    <button class="mobile-menu-close" onclick="closeParentDropdown(this)"><i class="fa fa-times"></i></button>
                     <div class="tool-dropdown-close"></div>
                     <div class="tool-dropdown-group">
                         <div class="tool-dropdown-title">导入/导出</div>
@@ -859,6 +902,7 @@
             <div class="tool-dropdown">
                 <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-cog"></i> 系统设置</button>
                 <div class="tool-dropdown-content">
+                    <button class="mobile-menu-close" onclick="closeParentDropdown(this)"><i class="fa fa-times"></i></button>
                     <div class="tool-dropdown-close"></div>
                     <div class="tool-dropdown-group">
                         <div class="tool-dropdown-title">用户设置</div>
@@ -882,6 +926,7 @@
             <div class="tool-dropdown">
                 <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-database"></i> 数据分析</button>
                 <div class="tool-dropdown-content">
+                    <button class="mobile-menu-close" onclick="closeParentDropdown(this)"><i class="fa fa-times"></i></button>
                     <div class="tool-dropdown-close"></div>
                     <div class="tool-dropdown-group">
                         <div class="tool-dropdown-title">统计分析</div>
@@ -1681,24 +1726,33 @@
         
         // 下拉菜单切换函数
         function toggleDropdown(button) {
-            // 关闭所有其他下拉菜单
-            const dropdowns = document.querySelectorAll('.tool-dropdown');
-            dropdowns.forEach(dropdown => {
-                if (dropdown !== button.parentElement && dropdown.classList.contains('active')) {
-                    dropdown.classList.remove('active');
-                }
+            const dropdown = button.closest('.tool-dropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // 先关闭所有打开的下拉菜单
+            document.querySelectorAll('.tool-dropdown').forEach(d => {
+                d.classList.remove('active');
             });
             
-            // 切换当前下拉菜单
-            button.parentElement.classList.toggle('active');
-            
-            // 点击其他区域关闭下拉菜单
-            document.addEventListener('click', function closeDropdown(e) {
-                if (!button.parentElement.contains(e.target)) {
-                    button.parentElement.classList.remove('active');
-                    document.removeEventListener('click', closeDropdown);
+            // 如果当前菜单是关闭的，则打开它
+            if (!isActive) {
+                dropdown.classList.add('active');
+                
+                // 移动端添加点击背景遮罩关闭功能
+                if (window.innerWidth <= 768) {
+                    const closeDropdown = function(e) {
+                        if (!dropdown.querySelector('.tool-dropdown-content').contains(e.target)) {
+                            dropdown.classList.remove('active');
+                            document.removeEventListener('touchstart', closeDropdown);
+                        }
+                    };
+                    
+                    // 延迟添加事件监听器，避免立即触发
+                    setTimeout(function() {
+                        document.addEventListener('touchstart', closeDropdown);
+                    }, 100);
                 }
-            });
+            }
         }
         
         // 处理表格行点击
@@ -1811,6 +1865,49 @@
                 }
             });
         });
+        
+        // 点击菜单项后关闭菜单
+        document.querySelectorAll('.dropdown-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const dropdown = this.closest('.tool-dropdown');
+                if (dropdown) {
+                    setTimeout(function() {
+                        dropdown.classList.remove('active');
+                    }, 150); // 短暂延迟，确保点击事件完成
+                }
+            });
+        });
+        
+        // 下拉菜单切换函数
+        function toggleDropdown(button) {
+            const dropdown = button.closest('.tool-dropdown');
+            const isActive = dropdown.classList.contains('active');
+            
+            // 先关闭所有打开的下拉菜单
+            document.querySelectorAll('.tool-dropdown').forEach(d => {
+                d.classList.remove('active');
+            });
+            
+            // 如果当前菜单是关闭的，则打开它
+            if (!isActive) {
+                dropdown.classList.add('active');
+                
+                // 移动端添加点击背景遮罩关闭功能
+                if (window.innerWidth <= 768) {
+                    const closeDropdown = function(e) {
+                        if (!dropdown.querySelector('.tool-dropdown-content').contains(e.target)) {
+                            dropdown.classList.remove('active');
+                            document.removeEventListener('touchstart', closeDropdown);
+                        }
+                    };
+                    
+                    // 延迟添加事件监听器，避免立即触发
+                    setTimeout(function() {
+                        document.addEventListener('touchstart', closeDropdown);
+                    }, 100);
+                }
+            }
+        }
 
         // 初始化系统
         document.addEventListener('DOMContentLoaded', function() {
@@ -2054,6 +2151,14 @@
         // 显示工作站
         function showWorkstation(patientId, imageId) {
             window.location.href = `workstation/index.html?patientId=${patientId}&imageId=${imageId}`;
+        }
+
+        // 关闭父级下拉菜单的函数
+        function closeParentDropdown(button) {
+            const dropdown = button.closest('.tool-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
         }
     </script>
 </body>
