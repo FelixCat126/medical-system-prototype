@@ -71,8 +71,13 @@
             justify-content: center;
             font-size: 14px;
             min-width: 45px;
-            height: 25px;
+            height: 38px;
             transition: background-color 0.2s;
+        }
+        
+        .nav-button i {
+            margin-right: 10px; /* 增加图标与文字的距离 */
+            font-size: 16px; /* 稍微放大图标 */
         }
         
         .nav-button:hover {
@@ -241,6 +246,14 @@
             cursor: pointer;
             color: #FFFFFF;
             font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .context-menu-item i {
+            margin-right: 10px; /* 增加图标与文字的距离 */
+            width: 16px; /* 固定图标宽度 */
+            text-align: center; /* 居中图标 */
         }
         
         .context-menu-item:hover {
@@ -271,6 +284,10 @@
             font-size: 14px;
         }
         
+        .function-btn i {
+            margin-right: 8px; /* 增加图标与文字的距离 */
+        }
+        
         .function-btn.disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -286,11 +303,11 @@
             background-color: #4A90E2;
             color: white;
         }
-
+        
         /* 滚动条美化 */
         ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 6px;
+            height: 6px;
         }
         
         ::-webkit-scrollbar-track {
@@ -299,7 +316,7 @@
         
         ::-webkit-scrollbar-thumb {
             background: #3E5F8A;
-            border-radius: 5px;
+            border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
@@ -326,60 +343,411 @@
         .tool-dropdown-content {
             display: none;
             position: absolute;
-            background-color: #152c5e;
-            min-width: 200px;
-            max-width: 300px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            background-color: #1A2B3C;
+            min-width: 240px;
+            max-width: 320px;
+            box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.5);
             z-index: 2500;
-            border-radius: 3px;
-            border: 1px solid #2a4d9e;
-            padding: 5px;
-            left: 0;
+            border-radius: 6px;
+            border: 1px solid #3E5F8A;
+            padding: 8px;
+            right: 0;
             top: 100%;
+            margin-top: 5px;
+            overflow: hidden;
         }
         
         .tool-dropdown.active .tool-dropdown-content {
             display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .tool-dropdown-group {
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
         
         .tool-dropdown-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             color: #FFFFFF;
-            background-color: #1e3a8a;
-            padding: 3px 6px;
-            border-radius: 3px;
-            margin-bottom: 5px;
+            background-color: #2C3E50;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
         }
         
         .tool-dropdown-items {
-            padding: 3px;
+            padding: 5px;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
+            gap: 8px;
         }
         
         .tool-dropdown-items .dropdown-button {
             text-align: left;
             width: 100%;
-            padding: 5px;
+            padding: 8px 10px;
             white-space: nowrap;
-            border-radius: 3px;
-            margin: 2px 0;
+            border-radius: 4px;
+            margin: 0;
+            background-color: #243447;
+            color: #B8C3CE;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tool-dropdown-items .dropdown-button i {
+            margin-right: 10px; /* 增加图标与文字的距离 */
+            width: 16px; /* 固定图标宽度 */
+            text-align: center; /* 居中图标 */
+            color: #4A90E2; /* 图标颜色 */
         }
         
         .tool-dropdown-items .dropdown-button:hover {
-            background-color: #2A4D9E;
+            background-color: #3E5F8A;
+            color: #FFFFFF;
         }
         
         .tool-dropdown-items .dropdown-button.active {
-            background-color: #3E5F8A;
+            background-color: #4A90E2;
+            color: #FFFFFF;
         }
         
+        /* 移动端适配样式 */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE and Edge */
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            body::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
+            }
+            
+            /* 标题行 */
+            .header {
+                height: auto;
+                padding: 10px;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+            
+            /* 第一行：标题 */
+            .logo {
+                width: 100%;
+                font-size: 18px;
+                text-align: center;
+                margin-bottom: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .search-bar {
+                display: none; /* 隐藏搜索栏，节省空间 */
+            }
+            
+            /* 第二行：菜单按钮 */
+            .buttons-group {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-around;
+                margin-bottom: 10px;
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                white-space: nowrap;
+                padding: 0 5px;
+            }
+            
+            .buttons-group::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .nav-button {
+                margin: 0 4px;
+                min-width: auto;
+                padding: 8px 12px;
+                height: 38px;
+                font-size: 13px;
+                justify-content: center;
+                flex-shrink: 0;
+                flex-grow: 1;
+                max-width: 120px;
+            }
+            
+            .nav-button i {
+                margin-right: 5px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* 第三行：表格区域 */
+            .main-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+            
+            .table-container {
+                height: auto;
+                max-height: 35vh;
+                overflow-y: auto;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                flex: 1;
+            }
+            
+            .table-container::-webkit-scrollbar {
+                display: none;
+            }
+            
+            table {
+                width: auto;
+                min-width: 100%;
+            }
+            
+            thead {
+                position: sticky;
+                top: 0;
+                white-space: nowrap;
+                z-index: 20;
+            }
+            
+            th, td {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding: 10px 8px;
+            }
+            
+            /* 移动端优先展示的关键字段 */
+            .mobile-priority {
+                position: sticky;
+                left: 0;
+                z-index: 10;
+            }
+            
+            th.mobile-priority {
+                background-color: #2C3E50;
+                z-index: 30; /* 角落处的表头需要更高层级 */
+            }
+            
+            td.mobile-priority {
+                background-color: #34495E;
+            }
+            
+            /* 第四行：预览区域 */
+            .preview-section {
+                height: auto;
+                min-height: 30vh;
+                max-height: 35vh;
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+            
+            /* 标签区域适配 */
+            .tabs {
+                display: flex;
+                flex-wrap: wrap;
+                overflow: visible;
+                height: auto;
+                min-height: 44px;
+            }
+            
+            .tab {
+                white-space: nowrap;
+                height: 44px;
+                flex-grow: 1;
+                min-width: 80px;
+                justify-content: center;
+            }
+            
+            /* 缩略图区域横向滚动 */
+            .thumbnails {
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding: 15px;
+                height: calc(100% - 44px);
+                min-height: 180px;
+            }
+            
+            .thumbnails::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .thumbnail {
+                margin: 5px 10px 5px 0;
+                flex-shrink: 0;
+                width: 140px;
+                height: 140px;
+            }
+            
+            /* 第五行：功能按钮区 */
+            .function-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                height: auto;
+                min-height: 44px;
+                padding: 5px;
+                overflow: visible;
+            }
+            
+            .function-btn {
+                flex-grow: 1;
+                flex-shrink: 0;
+                margin: 5px;
+                height: 36px;
+                min-width: 90px;
+                max-width: 130px;
+                white-space: nowrap;
+            }
+            
+            /* 下拉菜单样式 */
+            .tool-dropdown-content {
+                position: fixed;
+                top: auto !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0;
+                width: 100%;
+                max-width: 100%;
+                max-height: 80vh;
+                overflow-y: auto;
+                transform: none;
+                border-radius: 12px 12px 0 0;
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                padding: 15px;
+                margin-top: 0;
+                z-index: 2600;
+            }
+            
+            .tool-dropdown-close {
+                display: block;
+                width: 40px;
+                height: 5px;
+                background-color: #4A90E2;
+                border-radius: 3px;
+                margin: 0 auto 15px auto;
+            }
+            
+            .tool-dropdown-title {
+                text-align: center;
+                padding: 10px;
+                font-size: 15px;
+            }
+            
+            .tool-dropdown-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-dropdown-items .dropdown-button {
+                padding: 12px 15px;
+                font-size: 15px;
+            }
+            
+            /* 添加背景遮罩 */
+            .tool-dropdown.active::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 2550;
+            }
+            
+            .context-menu {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                border-radius: 10px 10px 0 0;
+                z-index: 2700;
+            }
+            
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
+            
+            /* 添加底部安全间距 */
+            .tool-dropdown-content::after {
+                content: '';
+                display: block;
+                height: 20px;
+            }
+            
+            /* 操作按钮样式 */
+            .action-btn {
+                padding: 5px;
+                font-size: 12px;
+            }
+        }
+        
+        /* 超小屏幕适配 */
+        @media (max-width: 480px) {
+            .tool-dropdown-items {
+                grid-template-columns: 1fr;
+            }
+            
+            .thumbnail {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .nav-button {
+                min-width: auto;
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+            
+            .nav-button i {
+                margin-right: 4px;
+            }
+            
+            .tab {
+                min-width: 70px;
+                font-size: 12px;
+                padding: 0 10px;
+            }
+            
+            .function-btn {
+                min-width: 80px;
+                font-size: 12px;
+            }
+        }
+        
+        /* 模态窗口样式 */
         .modal-content {
             position: relative;
             background-color: #243447;
@@ -459,84 +827,86 @@
 <body>
     <!-- 顶部导航栏 -->
     <div class="header">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <div style="display: flex; align-items: center;">
-                <div class="logo">肺动脉介入手术计划管理系统</div>
-                <div style="margin-left: 50px;">
+        <div class="logo">肺动脉介入手术计划管理系统</div>
+        <div class="search-bar-container">
             <input type="text" class="search-bar" placeholder="输入搜索内容">
-                </div>
-            </div>
-            <div style="display: flex; align-items: center;">
-            <div class="buttons-group">
-                    <div class="tool-dropdown">
-                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-folder-open"></i> 文件管理</button>
-                        <div class="tool-dropdown-content">
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">导入/导出</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" onclick="handleImport()">导入文件</button>
-                                    <button class="dropdown-button" onclick="handleExport()">导出数据</button>
-                                    <button class="dropdown-button" onclick="showPacsModal()">PACS查询</button>
-                                    <button class="dropdown-button" onclick="handleDicomExport()">DICOM导出</button>
-            </div>
         </div>
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">数据操作</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" id="deleteBtn" onclick="showDeleteConfirmModal()">删除数据</button>
-                                    <button class="dropdown-button" onclick="handleBackup()">备份数据</button>
-                                    <button class="dropdown-button" onclick="handleRestore()">数据恢复</button>
-                                    <button class="dropdown-button" onclick="handleArchive()">归档</button>
-                                </div>
-                            </div>
+        <div class="buttons-group">
+            <div class="tool-dropdown">
+                <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-folder-open"></i> 文件管理</button>
+                <div class="tool-dropdown-content">
+                    <div class="tool-dropdown-close"></div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">导入/导出</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" onclick="handleImport()"><i class="fa fa-file-import"></i>导入文件</button>
+                            <button class="dropdown-button" onclick="handleExport()"><i class="fa fa-file-export"></i>导出数据</button>
+                            <button class="dropdown-button" onclick="showPacsModal()"><i class="fa fa-search"></i>PACS查询</button>
+                            <button class="dropdown-button" onclick="handleDicomExport()"><i class="fa fa-file-medical"></i>DICOM导出</button>
                         </div>
                     </div>
-                    <div class="tool-dropdown">
-                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-cog"></i> 系统设置</button>
-                        <div class="tool-dropdown-content">
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">用户设置</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" onclick="handleUserProfile()">用户信息</button>
-                                    <button class="dropdown-button" onclick="handlePassword()">修改密码</button>
-                                    <button class="dropdown-button" onclick="handlePreferences()">偏好设置</button>
-                                </div>
-                            </div>
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">系统配置</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" onclick="handleServerConfig()">服务器设置</button>
-                                    <button class="dropdown-button" onclick="handlePacsConfig()">PACS设置</button>
-                                    <button class="dropdown-button" onclick="handleSecurity()">安全设置</button>
-                                    <button class="dropdown-button" onclick="handleAdvanced()">高级设置</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tool-dropdown">
-                        <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-database"></i> 数据分析</button>
-                        <div class="tool-dropdown-content">
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">统计报表</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" onclick="handlePatientStats()">患者统计</button>
-                                    <button class="dropdown-button" onclick="handleDiagnosisStats()">诊断统计</button>
-                                    <button class="dropdown-button" onclick="handleTreatmentStats()">治疗统计</button>
-                                    <button class="dropdown-button" onclick="handleCustomReport()">自定义报表</button>
-                                </div>
-                            </div>
-                            <div class="tool-dropdown-group">
-                                <div class="tool-dropdown-title">数据导出</div>
-                                <div class="tool-dropdown-items">
-                                    <button class="dropdown-button" onclick="handleExcelExport()">Excel导出</button>
-                                    <button class="dropdown-button" onclick="handlePdfExport()">PDF报告</button>
-                                    <button class="dropdown-button" onclick="handleDataVisualize()">数据可视化</button>
-                                </div>
-                            </div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">数据操作</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" id="deleteBtn" onclick="showDeleteConfirmModal()"><i class="fa fa-trash-alt"></i>删除数据</button>
+                            <button class="dropdown-button" onclick="handleBackup()"><i class="fa fa-archive"></i>备份数据</button>
+                            <button class="dropdown-button" onclick="handleRestore()"><i class="fa fa-undo"></i>数据恢复</button>
+                            <button class="dropdown-button" onclick="handleArchive()"><i class="fa fa-folder"></i>归档</button>
                         </div>
                     </div>
                 </div>
-            <div class="user-avatar">用户</div>
+            </div>
+            <div class="tool-dropdown">
+                <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-cog"></i> 系统设置</button>
+                <div class="tool-dropdown-content">
+                    <div class="tool-dropdown-close"></div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">用户设置</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" onclick="handleUserProfile()"><i class="fa fa-user"></i>用户信息</button>
+                            <button class="dropdown-button" onclick="handlePassword()"><i class="fa fa-key"></i>修改密码</button>
+                            <button class="dropdown-button" onclick="handlePreferences()"><i class="fa fa-sliders-h"></i>偏好设置</button>
+                        </div>
+                    </div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">系统配置</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" onclick="handleServerConfig()"><i class="fa fa-server"></i>服务器设置</button>
+                            <button class="dropdown-button" onclick="handlePacsConfig()"><i class="fa fa-database"></i>PACS设置</button>
+                            <button class="dropdown-button" onclick="handleSecurity()"><i class="fa fa-shield-alt"></i>安全设置</button>
+                            <button class="dropdown-button" onclick="handleAdvanced()"><i class="fa fa-cogs"></i>高级设置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tool-dropdown">
+                <button class="nav-button" onclick="toggleDropdown(this)"><i class="fa fa-database"></i> 数据分析</button>
+                <div class="tool-dropdown-content">
+                    <div class="tool-dropdown-close"></div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">统计分析</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" onclick="handleStats()"><i class="fa fa-chart-bar"></i>数据统计</button>
+                            <button class="dropdown-button" onclick="handleRawData()"><i class="fa fa-table"></i>原始数据</button>
+                            <button class="dropdown-button" onclick="handleReports()"><i class="fa fa-file-alt"></i>生成报告</button>
+                        </div>
+                    </div>
+                    <div class="tool-dropdown-group">
+                        <div class="tool-dropdown-title">高级分析</div>
+                        <div class="tool-dropdown-items">
+                            <button class="dropdown-button" onclick="handleTrends()"><i class="fa fa-chart-line"></i>趋势分析</button>
+                            <button class="dropdown-button" onclick="handleComparison()"><i class="fa fa-columns"></i>对比分析</button>
+                            <button class="dropdown-button" onclick="handlePredictive()"><i class="fa fa-brain"></i>预测分析</button>
+                            <button class="dropdown-button" onclick="handleExport()"><i class="fa fa-file-export"></i>导出分析</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span style="margin-right: 10px;">管理员</span>
+                <div class="user-avatar">
+                    <i class="fa fa-user"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -600,15 +970,16 @@
         <table>
             <thead>
                 <tr>
-                    <th width="140px">检查时间</th>
-                    <th width="160px">患者姓名</th>
-                    <th width="120px">出生日期</th>
-                    <th width="80px">性别</th>
-                    <th width="150px">患者ID</th>
-                    <th width="120px">工作台</th>
-                    <th width="100px">影像类型</th>
-                    <th width="200px">检查描述</th>
-                    <th width="170px">检查号</th>
+                    <th width="40" class="mobile-priority">序号</th>
+                    <th width="100" class="mobile-priority">日期</th>
+                    <th width="100" class="mobile-priority">患者ID</th>
+                    <th width="100">患者姓名</th>
+                    <th width="60">性别</th>
+                    <th width="60">年龄</th>
+                    <th width="120">诊断类型</th>
+                    <th width="150">诊断结果</th>
+                    <th width="100">状态</th>
+                    <th width="150">操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -1419,6 +1790,270 @@
         
         function handleDataVisualize() {
             alert('数据可视化功能即将推出');
+        }
+
+        // 点击下拉菜单之外的区域关闭菜单
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.tool-dropdown');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.contains(event.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+
+        // 下拉菜单滑动条关闭功能（移动端）
+        document.querySelectorAll('.tool-dropdown-close').forEach(closeBtn => {
+            closeBtn.addEventListener('touchstart', function() {
+                const dropdown = this.closest('.tool-dropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+
+        // 初始化系统
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为表格添加示例数据
+            initializeSampleData();
+            
+            // 初始化移动端优化
+            initializeMobileOptimization();
+            
+            // 激活第一个标签页
+            document.querySelector('.tab').classList.add('active');
+        });
+        
+        // 移动端优化
+        function initializeMobileOptimization() {
+            // 检测是否是移动设备
+            const isMobile = window.innerWidth <= 768;
+            
+            // 如果是移动设备，调整表格
+            if (isMobile) {
+                console.log("应用移动端优化...");
+                
+                // 设置必显示列的背景色和粘性定位
+                const priorityHeaders = document.querySelectorAll('th.mobile-priority');
+                priorityHeaders.forEach(cell => {
+                    cell.style.position = 'sticky';
+                    cell.style.left = '0';
+                    cell.style.zIndex = '30';
+                    cell.style.backgroundColor = '#2C3E50';
+                });
+                
+                const priorityCells = document.querySelectorAll('td.mobile-priority');
+                priorityCells.forEach(cell => {
+                    cell.style.position = 'sticky';
+                    cell.style.left = '0';
+                    cell.style.zIndex = '10';
+                    cell.style.backgroundColor = '#34495E';
+                });
+                
+                // 优化缩略图区域
+                adjustThumbnailsHeight();
+                
+                // 优化功能按钮区域
+                const functionButtons = document.querySelectorAll('.function-btn');
+                functionButtons.forEach(btn => {
+                    // 移除长文本中的空格，优化显示
+                    const btnText = btn.textContent.trim();
+                    if (btnText.length > 10) {
+                        btn.setAttribute('title', btnText);
+                        btn.innerHTML = btn.innerHTML.replace(btnText, btnText.replace(/\s+/g, '<br>'));
+                    }
+                });
+            }
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', function() {
+                const currentIsMobile = window.innerWidth <= 768;
+                if (currentIsMobile !== isMobile) {
+                    // 页面刷新以应用正确的样式
+                    window.location.reload();
+                } else if (currentIsMobile) {
+                    // 如果仍然是移动模式，调整缩略图高度
+                    adjustThumbnailsHeight();
+                }
+            });
+        }
+        
+        // 调整缩略图容器高度
+        function adjustThumbnailsHeight() {
+            const previewSection = document.querySelector('.preview-section');
+            const tabs = document.querySelector('.tabs');
+            const thumbnails = document.querySelector('.thumbnails');
+            
+            if (previewSection && tabs && thumbnails) {
+                const availableHeight = previewSection.clientHeight;
+                const tabsHeight = tabs.clientHeight;
+                thumbnails.style.height = `${availableHeight - tabsHeight}px`;
+                console.log(`调整缩略图高度: ${availableHeight - tabsHeight}px`);
+            }
+        }
+        
+        // 在缩略图添加完成后调整高度
+        function updateThumbnails(patientId) {
+            const thumbnailContainer = document.querySelector('.thumbnails');
+            if (!thumbnailContainer) return;
+            
+            // 清空现有缩略图
+            thumbnailContainer.innerHTML = '';
+            
+            // 生成随机数量的缩略图
+            const thumbnailCount = 4 + Math.floor(Math.random() * 4); // 4-7个缩略图
+            
+            for (let i = 1; i <= thumbnailCount; i++) {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'thumbnail';
+                thumbnail.style.backgroundColor = getRandomColor(0.8);
+                
+                const titleSpan = document.createElement('div');
+                titleSpan.className = 'thumbnail-title';
+                titleSpan.textContent = `患者-${patientId}-图像${i}`;
+                
+                const content = document.createElement('div');
+                content.textContent = `CT层面 ${i}`;
+                
+                thumbnail.appendChild(titleSpan);
+                thumbnail.appendChild(content);
+                thumbnailContainer.appendChild(thumbnail);
+                
+                // 添加点击事件
+                thumbnail.addEventListener('click', function() {
+                    showWorkstation(patientId, i);
+                });
+            }
+            
+            // 调整高度
+            if (window.innerWidth <= 768) {
+                adjustThumbnailsHeight();
+            }
+        }
+
+        // 初始化示例数据
+        function initializeSampleData() {
+            const tableBody = document.querySelector('tbody');
+            if (!tableBody) return;
+            
+            // 清空现有数据
+            tableBody.innerHTML = '';
+            
+            // 示例数据
+            const patients = [
+                { id: 1, date: '2023-05-15', patientId: 'P20230515', name: '张三', gender: '男', age: 45, type: 'CT检查', result: '肺动脉高压', status: '已完成', priority: true },
+                { id: 2, date: '2023-05-16', patientId: 'P20230516', name: '李四', gender: '女', age: 38, type: 'MRI检查', result: '肺动脉异常', status: '进行中', priority: true },
+                { id: 3, date: '2023-05-17', patientId: 'P20230517', name: '王五', gender: '男', age: 52, type: 'CT检查', result: '肺部感染', status: '待分析', priority: true },
+                { id: 4, date: '2023-05-18', patientId: 'P20230518', name: '赵六', gender: '女', age: 41, type: 'CT检查', result: '肺动脉栓塞', status: '已完成', priority: false },
+                { id: 5, date: '2023-05-19', patientId: 'P20230519', name: '孙七', gender: '男', age: 60, type: 'MRI检查', result: '肺动脉高压', status: '已完成', priority: false },
+                { id: 6, date: '2023-05-20', patientId: 'P20230520', name: '周八', gender: '女', age: 35, type: 'CT检查', result: '肺部感染', status: '待分析', priority: false },
+                { id: 7, date: '2023-05-21', patientId: 'P20230521', name: '吴九', gender: '男', age: 48, type: 'MRI检查', result: '肺动脉异常', status: '进行中', priority: false },
+                { id: 8, date: '2023-05-22', patientId: 'P20230522', name: '郑十', gender: '女', age: 55, type: 'CT检查', result: '肺动脉栓塞', status: '已完成', priority: false }
+            ];
+            
+            // 创建行
+            patients.forEach(patient => {
+                const row = document.createElement('tr');
+                
+                // 创建单元格
+                const idCell = document.createElement('td');
+                idCell.textContent = patient.id;
+                idCell.className = patient.priority ? 'mobile-priority' : '';
+                row.appendChild(idCell);
+                
+                const dateCell = document.createElement('td');
+                dateCell.textContent = patient.date;
+                dateCell.className = patient.priority ? 'mobile-priority' : '';
+                row.appendChild(dateCell);
+                
+                const patientIdCell = document.createElement('td');
+                patientIdCell.textContent = patient.patientId;
+                patientIdCell.className = patient.priority ? 'mobile-priority' : '';
+                row.appendChild(patientIdCell);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = patient.name;
+                row.appendChild(nameCell);
+                
+                const genderCell = document.createElement('td');
+                genderCell.textContent = patient.gender;
+                row.appendChild(genderCell);
+                
+                const ageCell = document.createElement('td');
+                ageCell.textContent = patient.age;
+                row.appendChild(ageCell);
+                
+                const typeCell = document.createElement('td');
+                typeCell.textContent = patient.type;
+                row.appendChild(typeCell);
+                
+                const resultCell = document.createElement('td');
+                resultCell.textContent = patient.result;
+                row.appendChild(resultCell);
+                
+                const statusCell = document.createElement('td');
+                statusCell.textContent = patient.status;
+                row.appendChild(statusCell);
+                
+                // 操作按钮
+                const actionsCell = document.createElement('td');
+                actionsCell.innerHTML = `
+                    <button class="action-btn view-btn" onclick="viewPatient(${patient.id})">查看</button>
+                    <button class="action-btn edit-btn" onclick="editPatient(${patient.id})">编辑</button>
+                `;
+                row.appendChild(actionsCell);
+                
+                // 添加点击事件
+                row.addEventListener('click', function(e) {
+                    // 如果点击的是按钮，不做处理
+                    if (e.target.tagName === 'BUTTON') return;
+                    
+                    // 选中行
+                    document.querySelectorAll('tbody tr').forEach(tr => {
+                        tr.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    
+                    // 更新缩略图
+                    updateThumbnails(patient.id);
+                });
+                
+                // 添加到表格
+                tableBody.appendChild(row);
+            });
+            
+            // 添加样式到操作按钮
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .action-btn {
+                    background-color: #3E5F8A;
+                    color: white;
+                    border: none;
+                    border-radius: 3px;
+                    padding: 4px 8px;
+                    margin: 0 2px;
+                    cursor: pointer;
+                    font-size: 12px;
+                }
+                .view-btn:hover {
+                    background-color: #4A90E2;
+                }
+                .edit-btn:hover {
+                    background-color: #5A9FE2;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // 获取随机颜色
+        function getRandomColor(opacity = 1) {
+            const hue = Math.floor(Math.random() * 360);
+            return `hsla(${hue}, 50%, 40%, ${opacity})`;
+        }
+
+        // 显示工作站
+        function showWorkstation(patientId, imageId) {
+            window.location.href = `workstation/index.html?patientId=${patientId}&imageId=${imageId}`;
         }
     </script>
 </body>
