@@ -1,0 +1,38 @@
+---
+title: "肺动脉介入手术计划管理系统需求文档"
+author: "柏意慧心（南京）健康医疗科技有限公司"
+header-includes:
+  - |
+    ```{=openxml}
+    <w:HeaderReference w:type="default" r:id="rId1"/>
+    <w:FooterReference w:type="default" r:id="rId2"/>
+    ```
+  - |
+    ```{=openxml}
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Header"/>
+      </w:pPr>
+      <w:r>
+        <w:t>柏意慧心（南京）健康医疗科技有限公司</w:t>
+      </w:r>
+    </w:p>
+    ```
+  - |
+    ```{=openxml}
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Footer"/>
+        <w:jc w:val="center"/>
+      </w:pPr>
+      <w:r>
+        <w:fldChar w:fldCharType="begin"/>
+        <w:instrText>PAGE</w:instrText>
+        <w:fldChar w:fldCharType="end"/>
+      </w:r>
+    </w:p>
+    ```
+mainfont: "Microsoft YaHei"
+fontsize: 12pt
+geometry: "left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm"
+--- 

@@ -1,0 +1,141 @@
+/* 主题样式文件 */
+
+/* 默认主题（暗蓝） - 与当前应用保持一致 */
+:root {
+  /* 主要背景色 */
+  --main-bg-color: #243447;
+  /* 深色背景，用于导航栏、标题等 */
+  --dark-bg-color: #1A2B3C;
+  /* 中等背景，用于表格头、选项卡等 */
+  --medium-bg-color: #2C3E50;
+  /* 浅色背景，用于表格行、搜索栏等 */
+  --light-bg-color: #34495E;
+  /* 边框和分隔线颜色 */
+  --border-color: #3E5F8A;
+  /* 主要强调色，用于按钮、选中项等 */
+  --accent-color: #4A90E2;
+  /* 鼠标悬停时的颜色 */
+  --hover-color: #5A9FE2;
+  /* 成功状态颜色 */
+  --success-color: #2ECC71;
+  /* 主要文本颜色 */
+  --text-color: #FFFFFF;
+  /* 次要文本颜色 */
+  --secondary-text-color: #B8C3CE;
+  /* 按钮背景色 */
+  --button-bg-color: #3E5F8A;
+  /* 禁用状态的透明度 */
+  --disabled-opacity: 0.5;
+}
+
+/* 深紫主题 */
+.theme-deep-purple {
+  /* 主要背景色 */
+  --main-bg-color: #2D2438;
+  /* 深色背景，用于导航栏、标题等 */
+  --dark-bg-color: #1E1629;
+  /* 中等背景，用于表格头、选项卡等 */
+  --medium-bg-color: #332A4B;
+  /* 浅色背景，用于表格行、搜索栏等 */
+  --light-bg-color: #3D3356;
+  /* 边框和分隔线颜色 */
+  --border-color: #534375;
+  /* 主要强调色，用于按钮、选中项等 */
+  --accent-color: #8A6DE2;
+  /* 鼠标悬停时的颜色 */
+  --hover-color: #9D85E2;
+  /* 成功状态颜色 */
+  --success-color: #6ECB8E;
+  /* 主要文本颜色 */
+  --text-color: #FFFFFF;
+  /* 次要文本颜色 */
+  --secondary-text-color: #CABFDC;
+  /* 按钮背景色 */
+  --button-bg-color: #534375;
+  /* 禁用状态的透明度 */
+  --disabled-opacity: 0.5;
+}
+
+/* 翡翠绿主题 */
+.theme-emerald {
+  /* 主要背景色 */
+  --main-bg-color: #1E3B33;
+  /* 深色背景，用于导航栏、标题等 */
+  --dark-bg-color: #0F2922;
+  /* 中等背景，用于表格头、选项卡等 */
+  --medium-bg-color: #25463E;
+  /* 浅色背景，用于表格行、搜索栏等 */
+  --light-bg-color: #2D5347;
+  /* 边框和分隔线颜色 */
+  --border-color: #3A6A5A;
+  /* 主要强调色，用于按钮、选中项等 */
+  --accent-color: #2ECB95;
+  /* 鼠标悬停时的颜色 */
+  --hover-color: #40E0AC;
+  /* 成功状态颜色 */
+  --success-color: #5BDE8A;
+  /* 主要文本颜色 */
+  --text-color: #FFFFFF;
+  /* 次要文本颜色 */
+  --secondary-text-color: #B3D0C7;
+  /* 按钮背景色 */
+  --button-bg-color: #3A6A5A;
+  /* 禁用状态的透明度 */
+  --disabled-opacity: 0.5;
+}
+
+/* 暖橙主题 */
+.theme-warm-orange {
+  /* 主要背景色 */
+  --main-bg-color: #3D2E24;
+  /* 深色背景，用于导航栏、标题等 */
+  --dark-bg-color: #2C1E15;
+  /* 中等背景，用于表格头、选项卡等 */
+  --medium-bg-color: #473728;
+  /* 浅色背景，用于表格行、搜索栏等 */
+  --light-bg-color: #5B4636;
+  /* 边框和分隔线颜色 */
+  --border-color: #75593E;
+  /* 主要强调色，用于按钮、选中项等 */
+  --accent-color: #E2814A;
+  /* 鼠标悬停时的颜色 */
+  --hover-color: #F09864;
+  /* 成功状态颜色 */
+  --success-color: #85C66B;
+  /* 主要文本颜色 */
+  --text-color: #FFFFFF;
+  /* 次要文本颜色 */
+  --secondary-text-color: #D6C4B3;
+  /* 按钮背景色 */
+  --button-bg-color: #75593E;
+  /* 禁用状态的透明度 */
+  --disabled-opacity: 0.5;
+}
+
+/* 高对比度主题 */
+.theme-high-contrast {
+  /* 主要背景色 */
+  --main-bg-color: #000000;
+  /* 深色背景，用于导航栏、标题等 */
+  --dark-bg-color: #121212;
+  /* 中等背景，用于表格头、选项卡等 */
+  --medium-bg-color: #1E1E1E;
+  /* 浅色背景，用于表格行、搜索栏等 */
+  --light-bg-color: #2A2A2A;
+  /* 边框和分隔线颜色 */
+  --border-color: #444444;
+  /* 主要强调色，用于按钮、选中项等 */
+  --accent-color: #FFCC00;
+  /* 鼠标悬停时的颜色 */
+  --hover-color: #FFD633;
+  /* 成功状态颜色 */
+  --success-color: #00FF00;
+  /* 主要文本颜色 */
+  --text-color: #FFFFFF;
+  /* 次要文本颜色 */
+  --secondary-text-color: #E0E0E0;
+  /* 按钮背景色 */
+  --button-bg-color: #444444;
+  /* 禁用状态的透明度 */
+  --disabled-opacity: 0.5;
+} 

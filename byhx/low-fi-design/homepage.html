@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺动脉介入手术管理系统 - 主页</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        /* 顶部导航栏 */
+        .header {
+            background-color: #1e1e1e;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .nav-controls {
+            display: flex;
+            align-items: center;
+        }
+        .search-box {
+            margin-right: 15px;
+            padding: 6px 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            width: 200px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #2196f3;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .theme-toggle {
+            margin-left: 15px;
+            width: 40px;
+            height: 20px;
+            background-color: #444;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .theme-toggle::after {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 22px;
+            transition: left 0.3s;
+        }
+        
+        /* 中部内容区 */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px;
+            overflow: auto;
+        }
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .content-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .filter-controls {
+            display: flex;
+            align-items: center;
+        }
+        .filter-dropdown {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #ccc;
+        }
+        
+        /* 患者数据表格 */
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .patient-table th, .patient-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        .patient-table th {
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+        .patient-table tr:hover {
+            background-color: #2a2a2a;
+        }
+        .status-completed {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 12px;
+        }
+        .status-pending {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            background-color: #ff9800;
+            color: white;
+            font-size: 12px;
+        }
+        .status-processing {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            background-color: #2196f3;
+            color: white;
+            font-size: 12px;
+        }
+        .action-button {
+            margin-right: 5px;
+            padding: 4px 8px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .action-button.edit {
+            background-color: #4caf50;
+        }
+        .action-button.delete {
+            background-color: #f44336;
+        }
+        
+        /* 底部缩略图预览区 */
+        .preview-container {
+            border-top: 1px solid #333;
+            padding-top: 15px;
+            height: 200px;
+        }
+        .preview-tabs {
+            display: flex;
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+        }
+        .preview-tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .preview-tab.active {
+            background-color: #2196f3;
+            color: white;
+            border-radius: 4px 4px 0 0;
+        }
+        .preview-content {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .preview-item {
+            width: 150px;
+            height: 120px;
+            margin-right: 10px;
+            background-color: #2d2d2d;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="logo">肺动脉介入手术管理系统</div>
+            <div class="nav-controls">
+                <input type="text" class="search-box" placeholder="搜索患者...">
+                <div class="user-info">
+                    <div class="user-avatar">医</div>
+                    <span>张医生</span>
+                </div>
+                <div class="theme-toggle" title="切换主题"></div>
+            </div>
+        </header>
+        
+        <!-- 中部内容区 -->
+        <main class="content">
+            <div class="content-header">
+                <div class="content-title">患者数据列表</div>
+                <div class="filter-controls">
+                    <span>筛选：</span>
+                    <select class="filter-dropdown">
+                        <option>全部状态</option>
+                        <option>已完成</option>
+                        <option>进行中</option>
+                        <option>待处理</option>
+                    </select>
+                    <select class="filter-dropdown">
+                        <option>全部日期</option>
+                        <option>最近7天</option>
+                        <option>最近30天</option>
+                        <option>自定义...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 患者数据表格 -->
+            <table class="patient-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>姓名</th>
+                        <th>年龄</th>
+                        <th>性别</th>
+                        <th>检查日期</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>P001</td>
+                        <td>张三</td>
+                        <td>45</td>
+                        <td>男</td>
+                        <td>2024-04-10</td>
+                        <td><span class="status-completed">已完成</span></td>
+                        <td>
+                            <button class="action-button">查看</button>
+                            <button class="action-button edit">编辑</button>
+                            <button class="action-button delete">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>P002</td>
+                        <td>李四</td>
+                        <td>60</td>
+                        <td>女</td>
+                        <td>2024-04-09</td>
+                        <td><span class="status-processing">进行中</span></td>
+                        <td>
+                            <button class="action-button">查看</button>
+                            <button class="action-button edit">编辑</button>
+                            <button class="action-button delete">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>P003</td>
+                        <td>王五</td>
+                        <td>52</td>
+                        <td>男</td>
+                        <td>2024-04-08</td>
+                        <td><span class="status-pending">待处理</span></td>
+                        <td>
+                            <button class="action-button">查看</button>
+                            <button class="action-button edit">编辑</button>
+                            <button class="action-button delete">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>P004</td>
+                        <td>赵六</td>
+                        <td>38</td>
+                        <td>女</td>
+                        <td>2024-04-07</td>
+                        <td><span class="status-completed">已完成</span></td>
+                        <td>
+                            <button class="action-button">查看</button>
+                            <button class="action-button edit">编辑</button>
+                            <button class="action-button delete">删除</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>P005</td>
+                        <td>陈七</td>
+                        <td>65</td>
+                        <td>男</td>
+                        <td>2024-04-06</td>
+                        <td><span class="status-processing">进行中</span></td>
+                        <td>
+                            <button class="action-button">查看</button>
+                            <button class="action-button edit">编辑</button>
+                            <button class="action-button delete">删除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 底部缩略图预览区 -->
+            <div class="preview-container">
+                <div class="preview-tabs">
+                    <div class="preview-tab active">缩略图</div>
+                    <div class="preview-tab">信息</div>
+                    <div class="preview-tab">诊断记录</div>
+                </div>
+                <div class="preview-content">
+                    <div class="preview-item">缩略图1</div>
+                    <div class="preview-item">缩略图2</div>
+                    <div class="preview-item">缩略图3</div>
+                    <div class="preview-item">缩略图4</div>
+                    <div class="preview-item">缩略图5</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 低保真原型，仅为展示布局，无实际功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟点击按钮效果
+            const buttons = document.querySelectorAll('.action-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (button.textContent === '查看') {
+                        alert('进入工作站界面');
+                    } else {
+                        alert('点击了按钮: ' + button.textContent);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

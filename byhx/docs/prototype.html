@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺动脉三维建模与诊断辅助系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+        }
+        
+        body {
+            background-color: #243447;
+            color: #FFFFFF;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background-color: #1A2B3C;
+            height: 15vh;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: bold;
+            width: 200px;
+        }
+        
+        .search-bar {
+            background-color: #34495E;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 15px;
+            width: 240px;
+            height: 40px;
+            margin-right: 20px;
+        }
+        
+        .buttons-group {
+            display: flex;
+        }
+        
+        .nav-button {
+            background-color: #3E5F8A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            min-width: 60px;
+            height: 60px;
+            transition: background-color 0.2s;
+        }
+        
+        .nav-button:hover {
+            background-color: #5A9FE2;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #B8C3CE;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #4A90E2;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 中央表格区域 */
+        .table-container {
+            height: 45vh;
+            overflow-y: auto;
+            border-bottom: 1px solid #3E5F8A;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        thead {
+            background-color: #2C3E50;
+            position: sticky;
+            top: 0;
+        }
+        
+        th {
+            padding: 15px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        
+        tbody tr {
+            background-color: #34495E;
+            border-bottom: 1px solid #3E5F8A;
+            height: 48px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        tbody tr:hover {
+            background-color: #3E5F8A;
+        }
+        
+        tbody tr.selected {
+            background-color: #2C3E50;
+            border-left: 4px solid #2ECC71;
+        }
+        
+        td {
+            padding: 8px 12px;
+            font-size: 14px;
+            color: #B8C3CE;
+        }
+        
+        /* 底部预览和操作区 */
+        .preview-section {
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #2C3E50;
+            height: 44px;
+        }
+        
+        .tab {
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            background-color: #3E5F8A;
+            border-bottom: 3px solid #4A90E2;
+        }
+        
+        .tab:hover {
+            background-color: #3E5F8A;
+        }
+        
+        .thumbnails {
+            display: flex;
+            padding: 20px;
+            overflow-x: auto;
+            background-color: #1A2B3C;
+            height: calc(100% - 88px);
+        }
+        
+        .thumbnail {
+            width: 160px;
+            height: 160px;
+            margin-right: 20px;
+            background-color: #34495E;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+        
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .function-buttons {
+            display: flex;
+            background-color: #2C3E50;
+            padding: 0 20px;
+            overflow-x: auto;
+            height: 44px;
+        }
+        
+        .function-btn {
+            min-width: 120px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: none;
+            color: #B8C3CE;
+            cursor: pointer;
+            margin-right: 16px;
+            transition: background-color 0.2s;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .function-btn:hover {
+            background-color: #3E5F8A;
+            color: white;
+        }
+        
+        .function-btn.active {
+            background-color: #4A90E2;
+            color: white;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #2C3E50;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3E5F8A;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4A90E2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <div class="header">
+        <div style="display: flex; align-items: center;">
+            <div class="logo">肺动脉三维建模系统</div>
+            <input type="text" class="search-bar" placeholder="输入搜索内容">
+            <div class="buttons-group">
+                <button class="nav-button">导入</button>
+                <button class="nav-button">导出</button>
+                <button class="nav-button">删除</button>
+                <button class="nav-button">PACS</button>
+                <button class="nav-button">设置</button>
+            </div>
+        </div>
+        <div class="user-info">
+            <span>本地(5/200) 大小: 2.78GB/200GB</span>
+            <div class="user-avatar">用户</div>
+        </div>
+    </div>
+    
+    <!-- 中央表格区域 -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th width="140px">检查时间</th>
+                    <th width="160px">患者姓名</th>
+                    <th width="120px">出生日期</th>
+                    <th width="80px">性别</th>
+                    <th width="150px">患者ID</th>
+                    <th width="120px">工作台</th>
+                    <th width="100px">影像类型</th>
+                    <th width="200px">检查描述</th>
+                    <th width="170px">检查号</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr onclick="selectRow(this)" class="selected">
+                    <td>2018-02-11 08:57:08</td>
+                    <td>anonymous</td>
+                    <td></td>
+                    <td>M</td>
+                    <td>anonymous</td>
+                    <td></td>
+                    <td>CT</td>
+                    <td>anonymous</td>
+                    <td>CT20180208022</td>
+                </tr>
+                <tr onclick="selectRow(this)">
+                    <td>2023-04-19</td>
+                    <td>TEVAR_test</td>
+                    <td></td>
+                    <td>M</td>
+                    <td>20250106-090940</td>
+                    <td>TEVAR</td>
+                    <td>CT</td>
+                    <td>anonymous</td>
+                    <td>CT20250121043</td>
+                </tr>
+                <tr onclick="selectRow(this)">
+                    <td>2023-11-09 08:57:33</td>
+                    <td>TAVR_test</td>
+                    <td>1953-01-31</td>
+                    <td>M</td>
+                    <td>20240723-131251</td>
+                    <td>PCI, PTPA</td>
+                    <td>CT</td>
+                    <td>Head^01_HeadRoutine (Adult)</td>
+                    <td>UCT20231071805</td>
+                </tr>
+                <tr onclick="selectRow(this)">
+                    <td>2023-02-28</td>
+                    <td>EVAR_Jiaceng_test</td>
+                    <td></td>
+                    <td>M</td>
+                    <td>20250106-090422</td>
+                    <td>IA, TEVAR</td>
+                    <td>CT</td>
+                    <td>anonymous</td>
+                    <td>CT20250121049</td>
+                </tr>
+                <tr onclick="selectRow(this)">
+                    <td>2023-05-09</td>
+                    <td>EVAR_fushen_test</td>
+                    <td></td>
+                    <td>M</td>
+                    <td>anonymous</td>
+                    <td>EVAR, LEA</td>
+                    <td>CT</td>
+                    <td>anonymous</td>
+                    <td>CT20250121050</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 底部预览和操作区 -->
+    <div class="preview-section">
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab(this)">全部序列</div>
+            <div class="tab" onclick="switchTab(this)">工作台</div>
+        </div>
+        <div class="thumbnails">
+            <div class="thumbnail" onclick="openImage(this)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMzNDQ5NUUiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSI0MCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIyMCIgZmlsbD0iIzRBOTBFMiIvPjxsaW5lIHgxPSI0MCIgeTE9IjgwIiB4Mj0iMTIwIiB5Mj0iODAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjgwIiB5MT0iNDAiIHgyPSI4MCIgeTI9IjEyMCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiLz48L3N2Zz4=">
+            </div>
+            <div class="thumbnail" onclick="openImage(this)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMzNDQ5NUUiLz48ZWxsaXBzZSBjeD0iODAiIGN5PSI4MCIgcng9IjUwIiByeT0iMzAiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGVsbGlwc2UgY3g9IjgwIiBjeT0iODAiIHJ4PSIyNSIgcnk9IjE1IiBmaWxsPSIjNEE5MEUyIi8+PC9zdmc+">
+            </div>
+            <div class="thumbnail" onclick="openImage(this)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMzNDQ5NUUiLz48cGF0aCBkPSJNNDAgNDBDNDAgNDAgODAgMzAgMTIwIDQwQzE2MCA1MCAxMjAgMTIwIDgwIDEyMEM0MCAxMjAgMCA5MCA0MCA0MFoiIHN0cm9rZT0iI0ZGRkZGRiIgc3Ryb2tlLXdpZHRoPSIyIiBmaWxsPSJub25lIi8+PGNpcmNsZSBjeD0iODAiIGN5PSI4MCIgcj0iMTAiIGZpbGw9IiM0QTkwRTIiLz48L3N2Zz4=">
+            </div>
+            <div class="thumbnail" onclick="openImage(this)">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2MCIgaGVpZ2h0PSIxNjAiIGZpbGw9IiMzNDQ5NUUiLz48cmVjdCB4PSI0MCIgeT0iNDAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgc3Ryb2tlPSIjRkZGRkZGIiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiLz48Y2lyY2xlIGN4PSI4MCIgY3k9IjgwIiByPSIxNSIgZmlsbD0iIzRBOTBFMiIvPjwvc3ZnPg==">
+            </div>
+        </div>
+        <div class="function-buttons">
+            <button class="function-btn" onclick="activateButton(this)">全选</button>
+            <button class="function-btn" onclick="activateButton(this)">主动脉(EVAR)</button>
+            <button class="function-btn active" onclick="activateButton(this)">胸主动脉(TEVAR)</button>
+            <button class="function-btn" onclick="activateButton(this)">主动脉瓣(TAVR)</button>
+            <button class="function-btn" onclick="activateButton(this)">冠脉(PCI)</button>
+            <button class="function-btn" onclick="activateButton(this)">外周动脉(IA)</button>
+            <button class="function-btn" onclick="activateButton(this)">4D工作台</button>
+            <button class="function-btn" onclick="activateButton(this)">宗动脉</button>
+            <button class="function-btn" onclick="activateButton(this)">下肢动脉</button>
+        </div>
+    </div>
+
+    <script>
+        // 选择表格行
+        function selectRow(row) {
+            // 移除所有行的选中状态
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(r => r.classList.remove('selected'));
+            
+            // 添加选中状态到当前行
+            row.classList.add('selected');
+        }
+        
+        // 切换标签页
+        function switchTab(tab) {
+            // 移除所有标签的活动状态
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // 添加活动状态到当前标签
+            tab.classList.add('active');
+        }
+        
+        // 激活功能按钮
+        function activateButton(btn) {
+            // 移除所有按钮的活动状态
+            const buttons = document.querySelectorAll('.function-btn');
+            buttons.forEach(b => b.classList.remove('active'));
+            
+            // 添加活动状态到当前按钮
+            btn.classList.add('active');
+            
+            // 如果是4D工作台按钮，模拟导航到3D建模页面
+            if(btn.textContent.includes('4D工作台')) {
+                // 这里只是一个示例，实际应该导航到3D建模页面
+                alert('即将导航到3D建模界面');
+            }
+        }
+        
+        // 打开图像
+        function openImage(thumbnail) {
+            // 模拟点击图像后的行为
+            alert('打开医学影像详情视图');
+            // 实际应用中，这里应该跳转到详细的影像查看页面
+        }
+    </script>
+</body>
+</html> 

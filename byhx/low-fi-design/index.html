@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺动脉介入手术管理系统 - 低保真原型</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2196f3;
+            font-size: 28px;
+        }
+        h2 {
+            color: #4fc3f7;
+            margin-top: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .prototype-list {
+            list-style: none;
+            padding: 0;
+        }
+        .prototype-list li {
+            margin-bottom: 20px;
+            background-color: #2d2d2d;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .prototype-link {
+            display: flex;
+            text-decoration: none;
+            color: #fff;
+            padding: 15px 20px;
+        }
+        .prototype-link:hover {
+            background-color: #3d3d3d;
+        }
+        .prototype-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #2196f3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            margin-right: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .prototype-info {
+            flex: 1;
+        }
+        .prototype-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .prototype-desc {
+            font-size: 14px;
+            color: #aaa;
+        }
+        .intro {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>肺动脉介入手术管理系统</h1>
+        <div class="intro">
+            <p>本项目是一个专业的肺动脉介入手术计划管理系统，旨在通过先进的图像处理和3D建模技术，为心血管外科医生提供高精度的诊断和手术规划工具。系统基于B/S架构，实现肺动脉的精确三维重建，并提供一系列自动化和手动诊断工具。</p>
+            <p>以下是系统的低保真原型界面，用于展示系统的主要功能和布局。</p>
+        </div>
+        
+        <h2>低保真原型界面</h2>
+        <ul class="prototype-list">
+            <li>
+                <a href="homepage.html" class="prototype-link">
+                    <div class="prototype-icon">主</div>
+                    <div class="prototype-info">
+                        <div class="prototype-title">主页界面</div>
+                        <div class="prototype-desc">包含患者数据列表、搜索和筛选功能、以及缩略图预览区域</div>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="workstation.html" class="prototype-link">
+                    <div class="prototype-icon">工</div>
+                    <div class="prototype-info">
+                        <div class="prototype-title">工作站界面</div>
+                        <div class="prototype-desc">包含多视图显示(3D体积渲染、三个正交平面视图)、工具栏和诊断面板</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        
+        <h2>原型说明</h2>
+        <div class="intro">
+            <p>这些低保真原型界面基于需求文档《肺动脉介入手术计划管理系统》设计，主要展示系统的界面布局和关键功能，不包含实际的数据处理和图像渲染功能。</p>
+            <p>原型使用HTML和CSS构建，模拟了系统的基本交互，如切换工具、调整显示选项等，但不包含实际的数据处理和3D渲染功能。</p>
+        </div>
+    </div>
+</body>
+</html> 

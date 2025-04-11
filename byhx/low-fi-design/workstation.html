@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肺动脉介入手术管理系统 - 工作站</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        /* 顶部导航栏 */
+        .header {
+            background-color: #1a1a1a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            height: 50px;
+            z-index: 100;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        .patient-info {
+            display: flex;
+            align-items: center;
+            background-color: #2d2d2d;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .patient-info span {
+            margin-right: 15px;
+            font-size: 14px;
+        }
+        .patient-info strong {
+            color: #4fc3f7;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        .header-button {
+            background-color: #2d2d2d;
+            border: none;
+            color: #fff;
+            padding: 6px 12px;
+            margin-left: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .header-button.primary {
+            background-color: #2196f3;
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        /* 左侧工具栏 */
+        .sidebar {
+            width: 60px;
+            background-color: #1a1a1a;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 10px;
+            z-index: 50;
+        }
+        .tool-button {
+            width: 40px;
+            height: 40px;
+            background-color: #2d2d2d;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ccc;
+            font-size: 12px;
+        }
+        .tool-button.active {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        /* 工具栏区域 */
+        .toolbar {
+            width: 240px;
+            background-color: #1e1e1e;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .toolbar-header {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+        }
+        .toolbar-content {
+            padding: 15px;
+        }
+        .toolbar-section {
+            margin-bottom: 20px;
+        }
+        .toolbar-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        .toolbar-item {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .toolbar-item input[type="checkbox"],
+        .toolbar-item input[type="radio"] {
+            margin-right: 10px;
+        }
+        .toolbar-item label {
+            font-size: 14px;
+        }
+        .toolbar-slider {
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        /* 视图区域 */
+        .views-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: #121212;
+        }
+        
+        /* 3D视图 */
+        .main-view {
+            flex: 2;
+            background-color: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #333;
+        }
+        .main-view-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .view-controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .view-control-button {
+            width: 30px;
+            height: 30px;
+            background-color: #2d2d2d;
+            margin-left: 5px;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* 正交视图 */
+        .ortho-views {
+            flex: 1;
+            display: flex;
+            border-top: 1px solid #333;
+        }
+        .ortho-view {
+            flex: 1;
+            background-color: #1a1a1a;
+            position: relative;
+            border-right: 1px solid #333;
+            overflow: hidden;
+        }
+        .ortho-view:last-child {
+            border-right: none;
+        }
+        .ortho-view-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 11px;
+        }
+        
+        /* 右侧信息和测量面板 */
+        .info-panel {
+            width: 300px;
+            background-color: #1e1e1e;
+            border-left: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .info-panel-header {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+        }
+        .info-panel-content {
+            padding: 15px;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4fc3f7;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .info-item-label {
+            color: #aaa;
+        }
+        .info-item-value {
+            font-weight: bold;
+        }
+        
+        /* 伪3D渲染区域 */
+        .view-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .model-placeholder {
+            background-color: rgba(30, 144, 255, 0.2);
+            border: 1px solid rgba(30, 144, 255, 0.4);
+            width: 70%;
+            height: 70%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(30, 144, 255, 0.6);
+            font-size: 16px;
+            font-weight: bold;
+            transform: perspective(800px) rotateX(20deg) rotateY(30deg);
+        }
+        .ortho-content {
+            background-color: rgba(30, 144, 255, 0.1);
+            border: 1px solid rgba(30, 144, 255, 0.2);
+            width: 80%;
+            height: 80%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(30, 144, 255, 0.4);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">肺动脉介入手术管理系统</div>
+                <div class="patient-info">
+                    <span>患者: <strong>张三</strong></span>
+                    <span>ID: <strong>P001</strong></span>
+                    <span>检查日期: <strong>2024-04-10</strong></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-button">保存</button>
+                <button class="header-button">导出</button>
+                <button class="header-button primary">返回主页</button>
+            </div>
+        </header>
+        
+        <!-- 主要内容区 -->
+        <div class="main-content">
+            <!-- 左侧工具栏 -->
+            <div class="sidebar">
+                <div class="tool-button active" title="选择工具">选</div>
+                <div class="tool-button" title="平移工具">移</div>
+                <div class="tool-button" title="旋转工具">转</div>
+                <div class="tool-button" title="缩放工具">放</div>
+                <div class="tool-button" title="测量工具">量</div>
+                <div class="tool-button" title="标记工具">标</div>
+                <div class="tool-button" title="内窥镜">窥</div>
+                <div class="tool-button" title="截图">截</div>
+            </div>
+            
+            <!-- 具体工具设置 -->
+            <div class="toolbar">
+                <div class="toolbar-header">工具设置</div>
+                <div class="toolbar-content">
+                    <div class="toolbar-section">
+                        <div class="toolbar-section-title">显示设置</div>
+                        <div class="toolbar-item">
+                            <input type="checkbox" id="show-centerline" checked>
+                            <label for="show-centerline">显示中心线</label>
+                        </div>
+                        <div class="toolbar-item">
+                            <input type="checkbox" id="show-measurements" checked>
+                            <label for="show-measurements">显示测量结果</label>
+                        </div>
+                        <div class="toolbar-item">
+                            <input type="checkbox" id="show-annotations">
+                            <label for="show-annotations">显示标注</label>
+                        </div>
+                    </div>
+                    
+                    <div class="toolbar-section">
+                        <div class="toolbar-section-title">渲染选项</div>
+                        <div class="toolbar-item">
+                            <label>透明度:</label>
+                            <input type="range" class="toolbar-slider" min="0" max="100" value="70">
+                        </div>
+                        <div class="toolbar-item">
+                            <label>亮度:</label>
+                            <input type="range" class="toolbar-slider" min="0" max="100" value="50">
+                        </div>
+                        <div class="toolbar-item">
+                            <label>对比度:</label>
+                            <input type="range" class="toolbar-slider" min="0" max="100" value="60">
+                        </div>
+                    </div>
+                    
+                    <div class="toolbar-section">
+                        <div class="toolbar-section-title">颜色映射</div>
+                        <div class="toolbar-item">
+                            <input type="radio" name="colormap" id="colormap-1" checked>
+                            <label for="colormap-1">标准</label>
+                        </div>
+                        <div class="toolbar-item">
+                            <input type="radio" name="colormap" id="colormap-2">
+                            <label for="colormap-2">热图</label>
+                        </div>
+                        <div class="toolbar-item">
+                            <input type="radio" name="colormap" id="colormap-3">
+                            <label for="colormap-3">彩虹</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 视图区域 -->
+            <div class="views-container">
+                <!-- 3D视图 -->
+                <div class="main-view">
+                    <div class="main-view-label">3D视图</div>
+                    <div class="view-content">
+                        <div class="model-placeholder">肺动脉3D模型</div>
+                    </div>
+                    <div class="view-controls">
+                        <div class="view-control-button" title="重置视图">R</div>
+                        <div class="view-control-button" title="前视图">F</div>
+                        <div class="view-control-button" title="后视图">B</div>
+                        <div class="view-control-button" title="左视图">L</div>
+                        <div class="view-control-button" title="右视图">R</div>
+                        <div class="view-control-button" title="顶视图">T</div>
+                    </div>
+                </div>
+                
+                <!-- 正交视图 -->
+                <div class="ortho-views">
+                    <div class="ortho-view">
+                        <div class="ortho-view-label">横断面</div>
+                        <div class="view-content">
+                            <div class="ortho-content">横断面视图</div>
+                        </div>
+                    </div>
+                    <div class="ortho-view">
+                        <div class="ortho-view-label">矢状位</div>
+                        <div class="view-content">
+                            <div class="ortho-content">矢状位视图</div>
+                        </div>
+                    </div>
+                    <div class="ortho-view">
+                        <div class="ortho-view-label">冠状位</div>
+                        <div class="view-content">
+                            <div class="ortho-content">冠状位视图</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧信息面板 -->
+            <div class="info-panel">
+                <div class="info-panel-header">信息 & 测量</div>
+                <div class="info-panel-content">
+                    <div class="info-section">
+                        <div class="info-section-title">患者信息</div>
+                        <div class="info-item">
+                            <span class="info-item-label">姓名:</span>
+                            <span class="info-item-value">张三</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">年龄:</span>
+                            <span class="info-item-value">45岁</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">性别:</span>
+                            <span class="info-item-value">男</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">ID:</span>
+                            <span class="info-item-value">P001</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">检查日期:</span>
+                            <span class="info-item-value">2024-04-10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">测量结果</div>
+                        <div class="info-item">
+                            <span class="info-item-label">血管直径 #1:</span>
+                            <span class="info-item-value">4.2 mm</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">血管直径 #2:</span>
+                            <span class="info-item-value">3.8 mm</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">狭窄程度:</span>
+                            <span class="info-item-value">24%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">中心线长度:</span>
+                            <span class="info-item-value">86.5 mm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title">诊断记录</div>
+                        <textarea style="width: 100%; height: 80px; background-color: #2d2d2d; color: #fff; border: 1px solid #444; resize: none; padding: 8px; border-radius: 4px; margin-top: 5px;" placeholder="输入诊断意见..."></textarea>
+                        <button style="background-color: #2196f3; color: white; border: none; padding: 8px 15px; margin-top: 10px; border-radius: 4px; cursor: pointer; width: 100%;">保存诊断</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 低保真原型，仅为展示布局，无实际功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 工具栏按钮切换效果
+            const toolButtons = document.querySelectorAll('.tool-button');
+            toolButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    toolButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+            
+            // 视图控制按钮效果
+            const viewControlButtons = document.querySelectorAll('.view-control-button');
+            viewControlButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('切换到' + button.title);
+                });
+            });
+            
+            // 顶部导航按钮效果
+            const headerButtons = document.querySelectorAll('.header-button');
+            headerButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('点击了' + button.textContent + '按钮');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
